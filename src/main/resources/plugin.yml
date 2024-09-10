@@ -1,0 +1,23 @@
+name: SwFlagWar
+version: 0.0.1
+main: org.nott.SwFlagWar
+description: A Minecraft FlagWar plugin for Simple World Server.
+author: Nott
+website: https://github.com/isnott
+api-version: 1.20
+prefix: SwFlagWar
+depend: [ProtocolLib,PlaceholderAPI,Kingdoms,EcoItems]
+
+commands:
+  flagwar:
+    description: '占领战争'
+    usage: '使用：/<command> help 查看帮助'
+    aliases: 'fw'
+
+permissions:
+  flagwar.player:
+    description: 占领战争-玩家权限
+    default: true
+  flagwar.op:
+    description: 占领战争-管理员权限
+    default: op

@@ -1,0 +1,23 @@
+#|-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-|#
+#|++++++++++++++++++++++++++++++++++++++++++++++++++++++|#
+#|                      Structures                     |#
+#|++++++++++++++++++++++++++++++++++++++++++++++++++++|#
+#|-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-|#
+
+# To edit the structures themselves go to "Structures" folder.
+# This config is mainly used for general structure settings.
+# Note that some structures such as powercells, regulators and nexus are limited to 1
+# structure per land by default as having more of them doesn't make sense.
+# Set the limit option to 0 or -1 or just delete it entirely to disable the limit.
+# NOTE: If you remove or add a structures style, you'll need to restart the server.
+
+disable-shift-click: true
+remove-unclaimed: false
+
+# Should structures go directly to the player's inventory who broke the structure.
+to-inventory-on-break: false
+
+# The total amount of structures a single land can have.
+# This is different than individual structure limits.
+# Set to 0 to disable
+total-limit-per-land: 10
