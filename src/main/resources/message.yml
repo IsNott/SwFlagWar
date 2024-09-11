@@ -1,15 +1,14 @@
-help:
+war:
   op:
     - '&6创建空的占领战争：/fw create <战争名称> '
     - '&6移除占领战争 /fw del <战争名称>'
     - '&6取消所有战争 /fw cancel all'
     - '&6取消某个战争 /fw cancel <战争名称>'
-    - '&6添加战争地址 /fw add location <位置> <战争名称> '
-    - '&6查看战争位置 /fw location list <战争名称> '
-    - '&6删除战争位置 /fw location remove <位置列表索引>'
-    - '&6改变战争位置 /fw location reset <索引>'
-    - '&6改变战争开始时间 /fw setstart <时间>'
-    - '&6改变战争结束时间 /fw setstart <时间>'
+    - '&6添加战争地址 /fw add loc <位置> <战争名称> '
+    - '&6查看战争位置 /fw loc list <战争名称> '
+    - '&6删除战争位置 /fw loc remove <战争名称> <位置列表索引>'
+    - '&6改变战争位置 /fw loc reset <战争名称> <索引> <位置>'
+    - '&6改变战争时间 /fw settime <战争名称> <开始时间> <结束时间>'
     - '&6改变战争生效日期 /fw days <天数，以空格分隔>'
     - '&6改变战争生效王国主义 /fw types <类型，以空格分隔>'
     - '&6添加战争奖励 /fw rewards add <类型>'
@@ -21,9 +20,17 @@ help:
     - '&6是否在战争范围内才能获取奖励 /fw muststandon set <boolean>'
   player:
     - '&6查看战争列表：/fw list'
+  create_success: '&6战争创建成功'
+  already_exist: '&4已经存在同名的战争'
+  create_failed: '&4战争创建失败'
+  name_limit: '&4输入的名称太长，长度应大于3小于16'
+  war_not_exist: '&4所选战争不存在'
+  location_format_error: '&4坐标字符串有误'
+  index_format_error: '&4索引有误'
+
+common:
   next: '&6输入%s查看下一页'
   not_per: '&4你没有权限执行该命令'
-  name_limit: '&4输入的名称太长，长度应大于3小于16'
-  already_exist: '&4已经存在同名的战争'
   reloaded: '%&6插件重载成功'
-  create_success: '&6战争创建成功'
+  exception: '&4发生内部异常，查看控制台日志以检查'
+  wrong_page: '&4传入的页码数有误'

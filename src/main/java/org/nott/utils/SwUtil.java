@@ -1,6 +1,5 @@
 package org.nott.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,9 +11,9 @@ import org.nott.global.GlobalFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * @author Nott
@@ -79,10 +78,16 @@ public class SwUtil{
         return false;
     }
 
-    public static YamlConfiguration loadFile(String path) throws Exception{
-        File file = new File(path);
+    public static YamlConfiguration loadPlugFile(String path) throws Exception{
+        File file = new File(plugin.getDataFolder(),path);
         YamlConfiguration configuration = new YamlConfiguration();
         configuration.load(file);
         return configuration;
+    }
+
+    public static void LogThrow(Throwable e) throws RuntimeException{
+        Logger logger = plugin.getLogger();
+        logger.info(e.getMessage());
+        throw new RuntimeException(e);
     }
 }
