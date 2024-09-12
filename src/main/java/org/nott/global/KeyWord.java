@@ -22,6 +22,15 @@ public interface KeyWord {
         public static final String DAYS = "days";
         public static final String TYPES = "types";
         public static final String REWARDS = "rewards";
+        public static final String REWARDS_TYPE = "rewards.type";
+        public static final String REWARDS_COMMAND  = "rewards.command";
+        public static final String REWARDS_MATERIAL  = "rewards.material";
+        public static final String REWARDS_LEVEL_UP  = "rewards.level-up";
+        public static final String REWARDS_AMOUNT  = "rewards.amount";
+        public static final String REWARDS_EFFECT  = "rewards.effect";
+        public static final String REWARDS_PERIOD = "rewards.period";
+        public static final String REWARDS_PERIOD_VAL  = "rewards.period-val";
+        public static final String REWARDS_MUST_STAND_ON  = "rewards.must-stand-on";
     }
 
     public interface COMMON{

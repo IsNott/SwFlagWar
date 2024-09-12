@@ -238,7 +238,7 @@ public class FlagWarExecutor implements CommandExecutor {
                 commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "name_limit"));
                 return true;
             }
-            if (!SwUtil.checkHourStr(startTime) && !SwUtil.checkHourStr(endTime) && !SwUtil.hourIsBefore(startTime,endTime)) {
+            if (!SwUtil.checkHourStr(startTime) && !SwUtil.checkHourStr(endTime) && !SwUtil.hourIsBefore(startTime, endTime)) {
                 commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "date_format_error"));
                 return true;
             }
@@ -354,13 +354,13 @@ public class FlagWarExecutor implements CommandExecutor {
         List<String> msgPage1 = msg.stream().skip(skip).limit(10).collect(Collectors.toList());
         StringBuffer bf = new StringBuffer();
         for (String str : msgPage1) {
-            bf.append(str).append("\n");
+            bf.append(Color.ORANGE + str).append("\n");
         }
         if (msg.size() > (10 * index) + 1) {
             String next = common.getString(KeyWord.COMMON.NEXT);
             String page = " /fw help " + (index + 1);
-            bf.append(String.format(next, page));
+            bf.append(Color.ORANGE + String.format(next, page));
         }
-        commandSender.sendMessage(Color.ORANGE + bf.toString());
+        commandSender.sendMessage(bf.toString());
     }
 }

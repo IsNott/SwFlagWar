@@ -105,6 +105,11 @@ public class SwUtil{
         logger.log(Level.ALL,e.getMessage(),e);
     }
 
+    public static void log(String msg){
+        Logger logger = plugin.getLogger();
+        logger.log(Level.ALL,msg);
+    }
+
     public static boolean checkHourStr(String timeStr) {
         try {
             Formatter.DATE.HH_MM.parse(timeStr);
