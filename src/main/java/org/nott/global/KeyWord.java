@@ -14,6 +14,14 @@ public interface KeyWord {
         public static final String CREATE = "create";
         public static final String LIST = "list";
         public static final String LOCATIONS = "locations";
+        public static final String NAME = "name";
+        public static final String UUID = "UUID";
+        public static final String WORLD = "world";
+        public static final String START = "start";
+        public static final String END = "end";
+        public static final String DAYS = "days";
+        public static final String TYPES = "types";
+        public static final String REWARDS = "rewards";
     }
 
     public interface COMMON{

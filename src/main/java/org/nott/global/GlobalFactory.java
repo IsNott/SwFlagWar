@@ -1,6 +1,12 @@
 package org.nott.global;
 
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.SimpleFormatter;
 
 /**
  * @author Nott
@@ -20,4 +26,7 @@ public class GlobalFactory {
 
     public static final String WAR_MESSAGE_SUFFIX = "war";
 
+    public static final String WAR_BASE_DIR = "wars" + File.separator;
+
+    public static List<String> RUNNING_GAME_LOC = Collections.synchronizedList(new ArrayList<String>());
 }

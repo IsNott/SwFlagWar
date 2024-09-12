@@ -27,12 +27,12 @@ public class War {
 
     private List<Integer> types;
 
-    private List<Reward> rewards;
+    private Reward rewards;
 
     public War() {
     }
 
-    public War(String UUID, String name, String world, List<Location> locations, String start, String end, List<Integer> days, List<Integer> types, List<Reward> rewards) {
+    public War(String UUID, String name, String world, List<Location> locations, String start, String end, List<Integer> days, List<Integer> types, Reward rewards) {
         this.UUID = UUID;
         this.name = name;
         this.world = world;

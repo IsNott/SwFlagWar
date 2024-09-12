@@ -11,11 +11,11 @@ depend: [ProtocolLib,PlaceholderAPI,Kingdoms,EcoItems]
 commands:
   flagwar:
     description: '占领战争'
-    usage: '使用：/<command> help 查看帮助'
+    usage: '&4未知命令，使用/<command> help 查看帮助'
     aliases: 'fw'
   offer:
     description: '悬赏系统'
-    usage: '/offer help 查看帮助'
+    usage: '&4未知命令，使用/<command> help 查看帮助'
     aliases: 'of'
 
 permissions:

@@ -1,0 +1,46 @@
+# Id
+UUID: bfc46ca6-2aaa-48a6-8037-4f93027ab445
+# War game's name, 3 < length < 16
+name: '123'
+# Usable World Name,default 'world'
+world: world
+# Game take effect location
+locations:
+  - 23,23.000,23
+# Start Time HH:MM
+start: '23:00'
+# End Time HH:MM
+end: '24:00'
+# Game recycle days in a week,default everyday
+days: []
+# Require player KingdomsX type,default open to every type.
+types: []
+# War game winner rewards;
+rewards:
+  # Execute Command / Item / Exp / effect  1 2 3 4
+  type:
+    - 1
+    - 2
+    - 3
+  # Execute command value.
+  command: 'ecoitems give %player_name% %eco_coin_name% %s'
+  # Give item
+  material: ''
+  # Exp to level-up count
+  level-up: 0
+  # Item amount
+  amount: 5
+  # Player effect
+  effect: ''
+  # Reward Cycle Period
+  #    SINGLE,
+  #    SECOND,
+  #    MIN,
+  #    HOUR,
+  #    DAY,
+  #    WEEK
+  period: HOUR
+  # Periods value
+  period-val: 1
+  # If Player stand on War game location to get the rewards.
+  must-stand-on: false

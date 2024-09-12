@@ -1,7 +1,10 @@
 package org.nott.model;
 
 import lombok.Data;
+import org.nott.global.Period;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,6 +31,22 @@ public class Reward {
     private Integer periodVal;
 
     private boolean mustStandOn;
+
+    public Reward() {
+    }
+
+    public static Reward defVal(){
+        Reward reward = new Reward();
+        reward.setType(Collections.singletonList(1));
+        reward.setLevelUp(0);
+        reward.setAmount(0);
+        reward.setEffect("");
+        reward.setCommand("");
+        reward.setPeriodVal(1);
+        reward.setMustStandOn(true);
+        reward.setPeriod(Period.DAY.name());
+        return reward;
+    }
 
     public Reward(List<Integer> type, String command, String material, Integer levelUp, Integer amount, String effect, String period, Integer periodVal, boolean mustStandOn) {
         this.type = type;

@@ -3,10 +3,10 @@ package org.nott.manager;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.nott.global.GlobalFactory;
 import org.nott.model.Location;
 import org.nott.model.Reward;
 import org.nott.model.War;
@@ -52,12 +52,10 @@ public class FlagWarManager implements Manager {
 
 
 
+
     private static List<War> convertWarList(Plugin plugin) throws IOException, InvalidConfigurationException {
-        File dataFolder = plugin.getDataFolder();
-        String warsFolder = dataFolder + File.separator + "wars";
-        File file = new File(warsFolder);
-        File[] files = file.listFiles();
         ArrayList<War> wars = new ArrayList<>();
+        File[] files = SwUtil.getPluginFiles(GlobalFactory.WAR_BASE_DIR);
         for (File ymlFile : files) {
             YamlConfiguration child = new YamlConfiguration();
             child.load(ymlFile);
@@ -69,7 +67,7 @@ public class FlagWarManager implements Manager {
             String world = child.getString("world");
             List<String> locations =  child.getStringList("locations");
             List<Location> locationList = new ArrayList<>();
-            if (SwUtil.isNotEmpty(locations)) {
+            if (SwUtil.isNotNull(locations)) {
                 for (String location : locations) {
                     String[] splitStr = location.split(" ");
                     if (splitStr.length != 3) {
@@ -86,29 +84,26 @@ public class FlagWarManager implements Manager {
             }
             List<Integer> days = child.getIntegerList("days");
             List<Integer> types =  child.getIntegerList("types");
-            List<Map> rewards = (List<Map>) child.get("rewards");
-            ArrayList<Reward> rewardList = new ArrayList<>();
-            if (SwUtil.isNotEmpty(rewards)) {
-                for (Map map : rewards) {
-                    List<Integer> type = (List<Integer>) map.get("type");
-                    String command = (String) map.get("command");
-                    String material = (String) map.get("material");
-                    Integer levelUp = (Integer) map.get("level-up");
-                    Integer amount = (Integer) map.get("amount");
-                    if (StringUtils.isBlank(command) && StringUtils.isBlank(material) && levelUp == null && amount == null) {
-                        continue;
-                    }
-                    String effect = (String) map.get("effect");
-                    String period = (String) map.get("period");
-                    Integer periodVal = (Integer) map.get("period-val");
-                    boolean muststandOn = (boolean) map.get("must-stand-on");
-                    Reward reward = new Reward(type, command, material, levelUp, amount, effect, period, periodVal, muststandOn);
-                    rewardList.add(reward);
-                }
-            }
-            War configWar = new War(uuid, name, world, locationList, start, end, days, types, rewardList);
-            wars.add(configWar);
+            Map rewards = (Map) child.get("rewards");
+            Reward reward = new Reward();
 
+            if (SwUtil.isNotNull(rewards) && SwUtil.isNotNull(rewards.keySet())) {
+                List<Integer> type = (List<Integer>) rewards.get("type");
+                String command = (String) rewards.get("command");
+                String material = (String) rewards.get("material");
+                Integer levelUp = (Integer) rewards.get("level-up");
+                Integer amount = (Integer) rewards.get("amount");
+                if (StringUtils.isBlank(command) && StringUtils.isBlank(material) && levelUp == null && amount == null) {
+                    continue;
+                }
+                String effect = (String) rewards.get("effect");
+                String period = (String) rewards.get("period");
+                Integer periodVal = (Integer) rewards.get("period-val");
+                boolean muststandOn = (boolean) rewards.get("must-stand-on");
+                reward = new Reward(type, command, material, levelUp, amount, effect, period, periodVal, muststandOn);
+            }
+            War configWar = new War(uuid, name, world, locationList, start, end, days, types, reward);
+            wars.add(configWar);
         }
         return wars;
     }

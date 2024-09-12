@@ -1,7 +1,10 @@
 package org.nott.executor;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.nott.asyn.callback.SwCallBack;
 import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
+import org.nott.model.Reward;
 import org.nott.utils.SwUtil;
 
 import java.io.File;
@@ -32,8 +36,6 @@ public class FlagWarExecutor implements CommandExecutor {
     private Plugin plugin;
 
     public static YamlConfiguration messageFile;
-
-    public static final String WAR_BASE_DIR = "wars" + File.separator;
 
     public static final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
@@ -72,6 +74,9 @@ public class FlagWarExecutor implements CommandExecutor {
         // Handle 'fw help' Command
         boolean helpCommand = executeHelpCommand(isOp, args, commandSender);
 
+        // Handle 'fw list' Command
+        boolean warListCommand = executeListCommand(args, commandSender);
+
         // Handle 'fw reload' Command
         boolean reloadCommand = executeReloadCommand(commandSender, args, spigot);
 
@@ -84,38 +89,66 @@ public class FlagWarExecutor implements CommandExecutor {
         // Handle 'fw list location' Command
         boolean listLocationCommand = executeListLocationCommand(isOp, commandSender, args, spigot);
 
-        // Handle 'fw list remove/reset' Command
+        // Handle 'fw loc remove/reset' Command
         boolean setOrRemoveLocationCommand = executeSetOrRemoveLocationCommand(isOp, commandSender, args, spigot);
 
 
-        return helpCommand || reloadCommand || createCommand || addLocationCommand || listLocationCommand || setOrRemoveLocationCommand;
+        return helpCommand || warListCommand || reloadCommand || createCommand || addLocationCommand || listLocationCommand || setOrRemoveLocationCommand;
+    }
+
+    private boolean executeListCommand(String[] args, CommandSender commandSender) {
+        if (args.length == 1 && "list".equals(args[0])) {
+            try {
+                File[] pluginFiles = SwUtil.getPluginFiles(GlobalFactory.WAR_BASE_DIR);
+                if (SwUtil.arrayNotEmpty(pluginFiles)) {
+                    List<String> messages = new ArrayList<>();
+                    for (File warFile : pluginFiles) {
+                        YamlConfiguration configuration = new YamlConfiguration();
+                        configuration.load(warFile);
+                        List<String> locStrList = configuration.getStringList(KeyWord.WAR.LOCATIONS);
+                        String name = configuration.getString(KeyWord.WAR.NAME);
+                        if (SwUtil.isEmpty(locStrList) || StringUtils.isEmpty(name)) {
+                            continue;
+                        }
+                        String warNameMsgPerfix = SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_name");
+                        String warInfo = warNameMsgPerfix + ":" + name;
+                        messages.add(warInfo);
+                    }
+                    messages.add(Color.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "no_more_info"));
+                    commandSender.sendMessage(messages.toArray(new String[messages.size()]));
+                }
+            } catch (Exception e) {
+                SwUtil.LogThrow(e);
+            }
+        }
+        return false;
     }
 
     private boolean executeSetOrRemoveLocationCommand(boolean isOp, CommandSender commandSender, String[] args, Plugin spigot) {
         if (args.length > 2 && (KeyWord.WAR.REMOVE.equals(args[1]) || KeyWord.WAR.RESET.equals(args[1])) && KeyWord.WAR.LOC.equals(args[0])) {
-            if(requrieOP(isOp,commandSender))return true;
+            if (requrieOP(isOp, commandSender)) return true;
             try {
                 String indexStr = args[3];
                 String locationStr = args[4];
                 String[] xyz = locationStr.split(",");
                 int index = Integer.parseInt(indexStr);
                 if (!SwUtil.checkLocation(xyz)) {
-                    commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error"));
+                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error"));
                     return true;
                 }
                 if (index < 1) {
-                    commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "index_format_error"));
+                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "index_format_error"));
                     return true;
                 }
                 String name = args[2];
                 boolean isReset = KeyWord.WAR.RESET.equals(args[1]);
-                String path2War = WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
+                String path2War = GlobalFactory.WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
                 if (!SwUtil.fileIsExist(path2War)) {
-                    commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
+                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
                     return true;
                 }
                 YamlConfiguration configuration = SwUtil.loadPlugFile(path2War);
-                List<String> locations = configuration.getStringList("locations");
+                List<String> locations = configuration.getStringList(KeyWord.WAR.LOCATIONS);
                 locations.remove(index - 1);
                 if (isReset) {
                     locations.add(locationStr);
@@ -129,7 +162,7 @@ public class FlagWarExecutor implements CommandExecutor {
                 });
 
             } catch (Exception e) {
-                commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
+                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
                 SwUtil.LogThrow(e);
             }
         }
@@ -141,17 +174,17 @@ public class FlagWarExecutor implements CommandExecutor {
             try {
                 if (requrieOP(isOp, commandSender)) return true;
                 String name = args[2];
-                String path2War = WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
+                String path2War = GlobalFactory.WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
                 if (!SwUtil.fileIsExist(path2War)) {
-                    commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
+                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
                     return true;
                 }
                 YamlConfiguration configuration = SwUtil.loadPlugFile(path2War);
                 List<String> locations = configuration.getStringList("locations");
-                commandSender.sendMessage(locations.toArray(new String[]{}));
+                commandSender.sendMessage(locations.toArray(new String[locations.size()]));
                 return true;
             } catch (Exception e) {
-                commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
+                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
                 SwUtil.LogThrow(e);
             }
         }
@@ -159,7 +192,7 @@ public class FlagWarExecutor implements CommandExecutor {
     }
 
     private boolean executeAddLocationCommand(boolean isOp, CommandSender commandSender, String[] args, Plugin spigot) {
-        if (args.length == 4 && KeyWord.WAR.ADD.equals(args[0]) && KeyWord.WAR.LOC.equals(args[1])) {
+        if (args.length == 4 && KeyWord.WAR.ADD.equals(args[1]) && KeyWord.WAR.LOC.equals(args[0])) {
             try {
                 if (requrieOP(isOp, commandSender)) return true;
                 String location = args[2];
@@ -167,27 +200,27 @@ public class FlagWarExecutor implements CommandExecutor {
 
                 String[] xyz = location.split(",");
                 if (!SwUtil.checkLocation(xyz)) {
-                    commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error"));
+                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error"));
                     return true;
                 }
-                String path2War = WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
+                String path2War = GlobalFactory.WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
                 if (!SwUtil.fileIsExist(path2War)) {
-                    commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
+                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
                     return true;
                 }
                 scheduler.runTaskAsynchronously(spigot, () -> {
                     try {
                         YamlConfiguration configuration = SwUtil.loadPlugFile(path2War);
-                        List<String> locationList = configuration.getStringList(location);
+                        List<String> locationList = configuration.getStringList(KeyWord.WAR.LOCATIONS);
                         locationList.add(location);
-                        configuration.set(KeyWord.WAR.LOCATIONS,locationList);
-                        configuration.save(new File(path2War));
+                        configuration.set(KeyWord.WAR.LOCATIONS, locationList);
+                        configuration.save(new File(plugin.getDataFolder(), path2War));
                     } catch (Exception e) {
                         SwUtil.LogThrow(e);
                     }
                 });
             } catch (Exception e) {
-                commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
+                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
                 SwUtil.LogThrow(e);
             }
             return true;
@@ -196,19 +229,38 @@ public class FlagWarExecutor implements CommandExecutor {
     }
 
     private boolean executeCreateCommand(boolean isOp, CommandSender commandSender, String[] args, Plugin spigot) {
-        if (args.length == 2 && KeyWord.WAR.CREATE.equals(args[0])) {
+        if (args.length == 4 && KeyWord.WAR.CREATE.equals(args[0])) {
             if (requrieOP(isOp, commandSender)) return true;
             String createName = args[1];
+            String startTime = args[2];
+            String endTime = args[3];
             if (createName.length() < 3 || createName.length() > 16) {
-                commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "name_limit"));
+                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "name_limit"));
                 return true;
             }
-            String path2file = WAR_BASE_DIR + File.separator + createName + GlobalFactory.YML_PREFIX;
+            if (!SwUtil.checkHourStr(startTime) && !SwUtil.checkHourStr(endTime) && !SwUtil.hourIsBefore(startTime,endTime)) {
+                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "date_format_error"));
+                return true;
+            }
+            String path2file = GlobalFactory.WAR_BASE_DIR + File.separator + createName + GlobalFactory.YML_PREFIX;
             if (SwUtil.fileIsExist(path2file)) {
-                commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "already_exist"));
+                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "already_exist"));
                 return true;
             }
-
+            String playerName = commandSender.getName();
+            Player player = spigot.getServer().getPlayer(playerName);
+            String loc = "";
+            String world = "";
+            if (SwUtil.isNotNull(player)) {
+                Location location = player.getLocation();
+                double x = location.getX();
+                double y = location.getY();
+                double z = location.getZ();
+                loc = x + " " + y + " " + z;
+                world = player.getWorld().getName();
+            }
+            final String worldName = world;
+            final String locInfo = loc;
             scheduler.runTaskAsynchronously(spigot, () -> {
                 try {
                     File file = SwUtil.createPluginFile(path2file);
@@ -217,13 +269,13 @@ public class FlagWarExecutor implements CommandExecutor {
                     String id = UUID.randomUUID().toString();
                     yamlConfiguration.set("UUID", id);
                     yamlConfiguration.set("name", createName);
-                    yamlConfiguration.set("world", "world");
-                    yamlConfiguration.set("locations", Collections.emptyList());
-                    yamlConfiguration.set("start", "");
-                    yamlConfiguration.set("end", "");
+                    yamlConfiguration.set("world", StringUtils.isNotEmpty(worldName) ? worldName : "world");
+                    yamlConfiguration.set("locations", StringUtils.isNotEmpty(locInfo) ? Collections.singletonList(locInfo) : Collections.emptyList());
+                    yamlConfiguration.set("start", startTime);
+                    yamlConfiguration.set("end", endTime);
                     yamlConfiguration.set("days", Collections.emptyList());
                     yamlConfiguration.set("types", Collections.emptyList());
-                    yamlConfiguration.set("rewards", "");
+                    yamlConfiguration.set("rewards", SwUtil.convertMap(Reward.defVal()));
                     yamlConfiguration.save(file);
                 } catch (Exception e) {
                     plugin.getLogger().info("Create FlagWar failed");
@@ -235,7 +287,7 @@ public class FlagWarExecutor implements CommandExecutor {
                         @Override
                         public void returnMessage(String str) {
                             Player player = plugin.getServer().getPlayer(commandSender.getName());
-                            player.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "create_success"));
+                            player.sendMessage(Color.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "create_success"));
                         }
                     };
                 });
@@ -247,7 +299,7 @@ public class FlagWarExecutor implements CommandExecutor {
 
     private static boolean requrieOP(boolean isOp, CommandSender commandSender) {
         if (!isOp) {
-            commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "not_per"));
+            commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "not_per"));
             return true;
         }
         return false;
@@ -264,7 +316,7 @@ public class FlagWarExecutor implements CommandExecutor {
                     @Override
                     public void run() {
                         // call the callback with the result
-                        commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "reloaded"));
+                        commandSender.sendMessage(Color.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "reloaded"));
                     }
                 });
             });
@@ -274,7 +326,7 @@ public class FlagWarExecutor implements CommandExecutor {
         return false;
     }
 
-    private Boolean executeHelpCommand(boolean isOp, @NotNull String[] args, @NotNull CommandSender commandSender) {
+    private boolean executeHelpCommand(boolean isOp, @NotNull String[] args, @NotNull CommandSender commandSender) {
         ConfigurationSection help = messageFile.getConfigurationSection(GlobalFactory.WAR_MESSAGE_SUFFIX);
         ConfigurationSection common = messageFile.getConfigurationSection(GlobalFactory.COMMON_MSG_SUFFIX);
         if (args.length == 1 && KeyWord.COMMON.HELP.equals(args[0])) {
@@ -287,7 +339,7 @@ public class FlagWarExecutor implements CommandExecutor {
             try {
                 indexInt = Integer.parseInt(index);
             } catch (NumberFormatException e) {
-                commandSender.sendMessage(SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "wrong_page"));
+                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "wrong_page"));
                 return true;
             }
             returnHelpMessage(commandSender, common, help, indexInt, isOp);
@@ -309,6 +361,6 @@ public class FlagWarExecutor implements CommandExecutor {
             String page = " /fw help " + (index + 1);
             bf.append(String.format(next, page));
         }
-        commandSender.sendMessage(bf.toString());
+        commandSender.sendMessage(Color.ORANGE + bf.toString());
     }
 }
