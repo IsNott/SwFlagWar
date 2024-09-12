@@ -100,7 +100,7 @@ public class SwUtil{
         return configuration;
     }
 
-    public static void LogThrow(Throwable e) throws RuntimeException{
+    public static void logThrow(Throwable e) throws RuntimeException{
         Logger logger = plugin.getLogger();
         logger.log(Level.ALL,e.getMessage(),e);
     }

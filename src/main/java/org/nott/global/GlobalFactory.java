@@ -28,5 +28,7 @@ public class GlobalFactory {
 
     public static final String WAR_BASE_DIR = "wars" + File.separator;
 
+    public static final String EXAMPLE_FILE = "example_war.yml";
+
     public static List<String> RUNNING_GAME_LOC = Collections.synchronizedList(new ArrayList<String>());
 }

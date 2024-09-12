@@ -11,6 +11,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nott.executor.FlagWarExecutor;
 import org.nott.global.GlobalFactory;
@@ -18,6 +19,8 @@ import org.nott.manager.FlagWarManager;
 import org.nott.utils.SwUtil;
 
 import java.io.File;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -25,10 +28,6 @@ import java.util.logging.Logger;
 public class SwFlagWar extends JavaPlugin {
 
     public final Logger swLogger = super.getLogger();
-
-    public static ProtocolManager protocolManager;
-
-
 
     @Override
     public void onDisable() {
@@ -39,10 +38,14 @@ public class SwFlagWar extends JavaPlugin {
     public void onEnable() {
         File dataFolder = this.getDataFolder();
         saveDefaultConfig();
-        String warsFolder = dataFolder + File.separator + "wars";
+        String warsFolder = dataFolder + File.separator + GlobalFactory.WAR_BASE_DIR;
         File file = new File(warsFolder);
         if(!file.exists()){
             file.mkdir();
+        }
+        File exampleFile = new File(dataFolder + File.separator + GlobalFactory.EXAMPLE_FILE);
+        if(!exampleFile.exists()){
+            this.saveResource(GlobalFactory.EXAMPLE_FILE, false);
         }
         File[] files = file.listFiles();
         if(SwUtil.isNotNull(Arrays.asList(files))) {

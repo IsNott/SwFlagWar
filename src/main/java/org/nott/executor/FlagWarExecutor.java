@@ -1,9 +1,10 @@
 package org.nott.executor;
 
 import lombok.Data;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.nott.asyn.callback.SwCallBack;
 import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
+import org.nott.manager.FlagWarManager;
 import org.nott.model.Reward;
 import org.nott.utils.SwUtil;
 
@@ -114,11 +116,14 @@ public class FlagWarExecutor implements CommandExecutor {
                         String warInfo = warNameMsgPerfix + ":" + name;
                         messages.add(warInfo);
                     }
-                    messages.add(Color.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "no_more_info"));
-                    commandSender.sendMessage(messages.toArray(new String[messages.size()]));
+                    messages.add(ChatColor.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "no_more_info"));
+                    for (String message : messages) {
+                        commandSender.spigot().sendMessage(TextComponent.fromLegacy(message));
+                    }
+                    return true;
                 }
             } catch (Exception e) {
-                SwUtil.LogThrow(e);
+                SwUtil.logThrow(e);
             }
         }
         return false;
@@ -133,18 +138,18 @@ public class FlagWarExecutor implements CommandExecutor {
                 String[] xyz = locationStr.split(",");
                 int index = Integer.parseInt(indexStr);
                 if (!SwUtil.checkLocation(xyz)) {
-                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error"));
+                    commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error")));
                     return true;
                 }
                 if (index < 1) {
-                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "index_format_error"));
+                    commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "index_format_error")));
                     return true;
                 }
                 String name = args[2];
                 boolean isReset = KeyWord.WAR.RESET.equals(args[1]);
                 String path2War = GlobalFactory.WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
                 if (!SwUtil.fileIsExist(path2War)) {
-                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
+                    commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist")));
                     return true;
                 }
                 YamlConfiguration configuration = SwUtil.loadPlugFile(path2War);
@@ -162,8 +167,8 @@ public class FlagWarExecutor implements CommandExecutor {
                 });
 
             } catch (Exception e) {
-                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
-                SwUtil.LogThrow(e);
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception")));
+                SwUtil.logThrow(e);
             }
         }
         return false;
@@ -176,16 +181,19 @@ public class FlagWarExecutor implements CommandExecutor {
                 String name = args[2];
                 String path2War = GlobalFactory.WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
                 if (!SwUtil.fileIsExist(path2War)) {
-                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
+                    commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist")));
                     return true;
                 }
                 YamlConfiguration configuration = SwUtil.loadPlugFile(path2War);
                 List<String> locations = configuration.getStringList("locations");
-                commandSender.sendMessage(locations.toArray(new String[locations.size()]));
+                for (String location : locations) {
+                    commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.GREEN + location));
+                }
+
                 return true;
             } catch (Exception e) {
-                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
-                SwUtil.LogThrow(e);
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception")));
+                SwUtil.logThrow(e);
             }
         }
         return false;
@@ -200,12 +208,12 @@ public class FlagWarExecutor implements CommandExecutor {
 
                 String[] xyz = location.split(",");
                 if (!SwUtil.checkLocation(xyz)) {
-                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error"));
+                    commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "location_format_error")));
                     return true;
                 }
                 String path2War = GlobalFactory.WAR_BASE_DIR + name + GlobalFactory.YML_PREFIX;
                 if (!SwUtil.fileIsExist(path2War)) {
-                    commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist"));
+                    commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "war_not_exist")));
                     return true;
                 }
                 scheduler.runTaskAsynchronously(spigot, () -> {
@@ -216,12 +224,12 @@ public class FlagWarExecutor implements CommandExecutor {
                         configuration.set(KeyWord.WAR.LOCATIONS, locationList);
                         configuration.save(new File(plugin.getDataFolder(), path2War));
                     } catch (Exception e) {
-                        SwUtil.LogThrow(e);
+                        SwUtil.logThrow(e);
                     }
                 });
             } catch (Exception e) {
-                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception"));
-                SwUtil.LogThrow(e);
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "exception")));
+                SwUtil.logThrow(e);
             }
             return true;
         }
@@ -235,16 +243,16 @@ public class FlagWarExecutor implements CommandExecutor {
             String startTime = args[2];
             String endTime = args[3];
             if (createName.length() < 3 || createName.length() > 16) {
-                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "name_limit"));
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "name_limit")));
                 return true;
             }
             if (!SwUtil.checkHourStr(startTime) && !SwUtil.checkHourStr(endTime) && !SwUtil.hourIsBefore(startTime, endTime)) {
-                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "date_format_error"));
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "date_format_error")));
                 return true;
             }
             String path2file = GlobalFactory.WAR_BASE_DIR + File.separator + createName + GlobalFactory.YML_PREFIX;
             if (SwUtil.fileIsExist(path2file)) {
-                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "already_exist"));
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "already_exist")));
                 return true;
             }
             String playerName = commandSender.getName();
@@ -279,18 +287,10 @@ public class FlagWarExecutor implements CommandExecutor {
                     yamlConfiguration.save(file);
                 } catch (Exception e) {
                     plugin.getLogger().info("Create FlagWar failed");
-                    SwUtil.LogThrow(e);
+                    SwUtil.logThrow(e);
                 }
 
-                scheduler.runTask(spigot, () -> {
-                    new SwCallBack() {
-                        @Override
-                        public void returnMessage(String str) {
-                            Player player = plugin.getServer().getPlayer(commandSender.getName());
-                            player.sendMessage(Color.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "create_success"));
-                        }
-                    };
-                });
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.WAR_MESSAGE_SUFFIX, "create_success")));
             });
             return true;
         }
@@ -299,7 +299,7 @@ public class FlagWarExecutor implements CommandExecutor {
 
     private static boolean requrieOP(boolean isOp, CommandSender commandSender) {
         if (!isOp) {
-            commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "not_per"));
+            commandSender.sendMessage(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "not_per"));
             return true;
         }
         return false;
@@ -310,15 +310,15 @@ public class FlagWarExecutor implements CommandExecutor {
             scheduler.runTaskAsynchronously(spigot, () -> {
                 spigot.saveConfig();
                 loadMessageYamlFile();
-                //todo load war file
+                // load war file
+                try {
+                    new FlagWarManager(spigot).doManage();
+                } catch (Exception e) {
+                    SwUtil.logThrow(e);
+                }
 
-                Bukkit.getScheduler().runTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        // call the callback with the result
-                        commandSender.sendMessage(Color.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "reloaded"));
-                    }
-                });
+                // call the callback with the result
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(net.md_5.bungee.api.ChatColor.GREEN + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "reloaded")));
             });
 
             return true;
@@ -339,7 +339,7 @@ public class FlagWarExecutor implements CommandExecutor {
             try {
                 indexInt = Integer.parseInt(index);
             } catch (NumberFormatException e) {
-                commandSender.sendMessage(Color.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "wrong_page"));
+                commandSender.spigot().sendMessage(TextComponent.fromLegacy(ChatColor.RED + SwUtil.retMessage(messageFile, GlobalFactory.COMMON_MSG_SUFFIX, "wrong_page")));
                 return true;
             }
             returnHelpMessage(commandSender, common, help, indexInt, isOp);
@@ -354,12 +354,12 @@ public class FlagWarExecutor implements CommandExecutor {
         List<String> msgPage1 = msg.stream().skip(skip).limit(10).collect(Collectors.toList());
         StringBuffer bf = new StringBuffer();
         for (String str : msgPage1) {
-            bf.append(Color.ORANGE + str).append("\n");
+            bf.append(ChatColor.GOLD + str).append("\n");
         }
         if (msg.size() > (10 * index) + 1) {
             String next = common.getString(KeyWord.COMMON.NEXT);
             String page = " /fw help " + (index + 1);
-            bf.append(Color.ORANGE + String.format(next, page));
+            bf.append(ChatColor.GOLD + String.format(next, page));
         }
         commandSender.sendMessage(bf.toString());
     }
