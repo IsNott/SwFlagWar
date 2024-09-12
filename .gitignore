@@ -14,6 +14,33 @@ eula.txt
 *.iml
 *.ipr
 
+cache/
+config/
+libraries/
+logs/
+world/
+world_nether/
+world_the_end/
+plugins/
+eula.txt
+banned-ips.json
+banned-players.json
+commands.yml
+bukkit.yml
+commands.yml
+help.yml
+ops.json
+permissions.yml
+pufferfish.yml
+purpur.yml
+server.properties
+spigot.yml
+usercache.json
+version_history.json
+whitelist.json
+versions/
+
+
 ### Eclipse ###
 .apt_generated
 .classpath
