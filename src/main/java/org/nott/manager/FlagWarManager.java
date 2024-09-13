@@ -118,7 +118,8 @@ public class FlagWarManager implements Manager {
     }
 
     private void loadWar2mapInstantly(War war) {
-        FlagWarOpenEvent event = new FlagWarOpenEvent(war);
+        FlagWarOpenEvent event = new FlagWarOpenEvent();
+        event.setWar(war);
         Bukkit.getPluginManager().callEvent(event);
     }
 

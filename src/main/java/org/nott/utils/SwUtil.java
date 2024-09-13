@@ -113,6 +113,7 @@ public class SwUtil{
     public static void logThrow(Throwable e) throws RuntimeException{
         Logger logger = plugin.getLogger();
         logger.log(Level.ALL,e.getMessage(),e);
+        throw new RuntimeException(e);
     }
 
     public static void log(String msg){
@@ -212,7 +213,8 @@ public class SwUtil{
         World defWorld = Bukkit.getServer().getWorld("world");
         Objects.requireNonNull(defWorld);
         Block block = defWorld.getBlockAt((int) x, (int) y, (int) z);
-        return chunk.contains((BlockData) block);
+        BlockData blockData = block.getBlockData();
+        return chunk.contains(blockData);
     }
 }
 

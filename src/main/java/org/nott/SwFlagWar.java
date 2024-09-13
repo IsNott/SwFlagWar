@@ -1,28 +1,13 @@
 package org.nott;
 
 
-
-
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLib;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketEvent;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nott.executor.FlagWarExecutor;
 import org.nott.global.GlobalFactory;
+import org.nott.listener.SwFlagWarListener;
 import org.nott.manager.FlagWarManager;
 import org.nott.utils.SwUtil;
-
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -60,7 +45,7 @@ public class SwFlagWar extends JavaPlugin {
                 throw new RuntimeException(e);
             }
         }
-
+        this.getServer().getPluginManager().registerEvents(new SwFlagWarListener(),this);
         Objects.requireNonNull(this.getCommand(GlobalFactory.FW_COMMAND)).setExecutor(new FlagWarExecutor(this));
         swLogger.info("SimpleWorld FlagWar 加载成功");
 
