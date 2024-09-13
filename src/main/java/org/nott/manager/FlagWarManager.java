@@ -38,7 +38,7 @@ public class FlagWarManager implements Manager {
 
     private Logger logger;
 
-    public static Map<String, War> FLAG_WAR_MAP = new ConcurrentHashMap<>(16);
+    public static Map<String, War> STARTED_WAR_MAP = new ConcurrentHashMap<>(16);
 
     public static Map<String, War> SCHEDULE_WAR_MAP = new ConcurrentHashMap<>(16);
 
@@ -91,7 +91,7 @@ public class FlagWarManager implements Manager {
                 LocalTime startTime = LocalTime.parse(start, Formatter.DATE.DATE_TIME_HOUR);
                 LocalTime endTime = LocalTime.parse(end, Formatter.DATE.DATE_TIME_HOUR);
 
-                FLAG_WAR_MAP.remove(war.getUUID());
+                STARTED_WAR_MAP.remove(war.getUUID());
                 SCHEDULE_WAR_MAP.remove(war.getUUID());
 
                 war.setParseEndTime(endTime);
@@ -123,7 +123,7 @@ public class FlagWarManager implements Manager {
     }
 
     public static void loadWarGame2Map(War war) {
-        FLAG_WAR_MAP.put(war.getUUID(), war);
+        STARTED_WAR_MAP.put(war.getUUID(), war);
     }
 
     private static War parseWarPoJo(YamlConfiguration warConfig) {

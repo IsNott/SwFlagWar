@@ -1,7 +1,6 @@
 package org.nott.model;
 
 import lombok.Data;
-import org.nott.model.Location;
 
 /**
  * @author Nott
@@ -13,8 +12,4 @@ public class Region {
     private Location x1;
 
     private Location x2;
-
-    public boolean isIn(Location currentLocation){
-
-    }
 }

@@ -2,20 +2,18 @@ package org.nott.utils;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nott.global.Formatter;
 import org.nott.global.GlobalFactory;
-import org.nott.model.Region;
 import org.nott.model.Location;
 
 import java.io.File;
@@ -166,6 +164,12 @@ public class SwUtil{
         );
     }
 
+    public static <T extends CommandSender.Spigot> void spigotTextMessage(T spigot, String message, ChatColor color) {
+        spigot.sendMessage(
+                TextComponent.fromLegacy(color + message)
+        );
+    }
+
     public static void broadcast(String msg,ChatColor color){
         Bukkit.spigot().broadcast(
                 TextComponent.fromLegacy(msg + color)
@@ -186,10 +190,29 @@ public class SwUtil{
         }
     }
 
-    public static Chunk makeRegion(Location centerPoint, Integer radius) {
-        double x = Double.parseDouble(centerPoint.getX());
-        double y = Double.parseDouble(centerPoint.getY());
-        double z = Double.parseDouble(centerPoint.getZ());
-        return null;
+    public static Chunk makeRegion(Location centerPointLoc, Material m) {
+        double x = Double.parseDouble(centerPointLoc.getX());
+        double y = Double.parseDouble(centerPointLoc.getY());
+        double z = Double.parseDouble(centerPointLoc.getZ());
+        // Mark Flag war game center point.
+        World defWorld = Bukkit.getServer().getWorld("world");
+        Objects.requireNonNull(defWorld);
+        Block centerPointBlock = defWorld.getBlockAt((int) x, (int) y, (int) z);
+        Objects.requireNonNull(centerPointBlock);
+        centerPointBlock.setType(m);
+
+        // Get a chuck by block
+        return centerPointBlock.getChunk();
+    }
+
+    public static boolean isInChunkZone(org.bukkit.Location currLoc, Chunk chunk) {
+        double x = currLoc.getX();
+        double y = currLoc.getY();
+        double z = currLoc.getZ();
+        World defWorld = Bukkit.getServer().getWorld("world");
+        Objects.requireNonNull(defWorld);
+        Block block = defWorld.getBlockAt((int) x, (int) y, (int) z);
+        return chunk.contains((BlockData) block);
     }
 }
+

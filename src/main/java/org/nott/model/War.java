@@ -1,6 +1,7 @@
 package org.nott.model;
 
 import lombok.Data;
+import org.bukkit.Chunk;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -31,6 +32,8 @@ public class War {
     private List<Integer> days;
 
     private List<Integer> types;
+
+    private Chunk chunk;
 
     private Reward rewards;
 

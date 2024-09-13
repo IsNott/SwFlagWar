@@ -35,6 +35,8 @@ war:
   nothing_schedule: '没有可用的占领战争配置，调度结束'
   war_open_tip: '占领战争即将在%s开始，位置：%s，将于%s结束'
   war_starting_tip: '占领战争已经开始，位置：%s，将于%s结束'
+  enter_zone: '你已进入占领战争区域，放置占领物开始占领'
+  leave_zone: '你已离开占领战争区域'
 
 common:
   next: '输入%s查看下一页'
