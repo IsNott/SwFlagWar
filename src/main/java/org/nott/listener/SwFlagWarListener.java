@@ -8,11 +8,14 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -113,18 +116,27 @@ public class SwFlagWarListener implements Listener {
     // Drop player head probability while death.
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDeathEvent(PlayerDeathEvent event){
-        YamlConfiguration config = FlagWarExecutor.CONFIG_YML_FILE;
-        double probability = config.getDouble("drop_head.probability", 0.5);
-        if (probability < RandomUtils.nextDouble(0.0, probability)) {
-            return;
+        Player entity = event.getEntity();
+        EntityDamageEvent lastDamageCause = entity.getLastDamageCause();
+        if(lastDamageCause instanceof EntityDamageByEntityEvent){
+            EntityDamageByEntityEvent damageCause = (EntityDamageByEntityEvent) lastDamageCause;
+            Entity damageCauseEntity = damageCause.getEntity();
+            if(!(damageCauseEntity instanceof Player)){
+                return;
+            }
+            YamlConfiguration config = FlagWarExecutor.CONFIG_YML_FILE;
+            double probability = config.getDouble("drop_head.probability", 0.5);
+            if (probability < RandomUtils.nextDouble(0.0, 1.0)) {
+                return;
+            }
+            // Drop player's head
+            ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
+            SkullMeta sm = (SkullMeta) item.getItemMeta();
+            assert sm != null;
+            sm.setOwningPlayer(entity);
+            item.setItemMeta(sm);
+            event.getDrops().add(item);
         }
-        // Drop player's head
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
-        SkullMeta sm = (SkullMeta) item.getItemMeta();
-        assert sm != null;
-        sm.setOwningPlayer(event.getEntity());
-        item.setItemMeta(sm);
-        event.getDrops().add(item);
     }
 
 }
