@@ -1,7 +1,13 @@
 package org.nott.utils;
 
+import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -9,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nott.global.Formatter;
 import org.nott.global.GlobalFactory;
+import org.nott.model.Region;
+import org.nott.model.Location;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +66,10 @@ public class SwUtil{
         }else {
             return msgFile.getString(path);
         }
+    }
+
+    public static String retMessage(@NotNull FileConfiguration msgFile, @NotNull String path) {
+        return msgFile.getString(path);
     }
 
     public static File[] getPluginFiles(String path){
@@ -146,5 +158,38 @@ public class SwUtil{
             throw new RuntimeException(e);
         }
         return map;
+    }
+
+    public static void sendMessage2Sender(CommandSender sender, String message, @Nullable ChatColor color) {
+        sender.spigot().sendMessage(
+                TextComponent.fromLegacy(color + message)
+        );
+    }
+
+    public static void broadcast(String msg,ChatColor color){
+        Bukkit.spigot().broadcast(
+                TextComponent.fromLegacy(msg + color)
+        );
+    }
+
+    public static void makeCircle(Location loc, Integer radius, Material m) {
+        int x;
+        int y = Integer.parseInt(loc.getX());
+        int z;
+
+        for (double i = 0.0; i < 360.0; i += 0.1) {
+            double angle = i * Math.PI / 180;
+            x = (int) (Double.parseDouble(loc.getX()) + radius * Math.cos(angle));
+            z = (int) (Double.parseDouble(loc.getZ()) + radius * Math.sin(angle));
+
+            Objects.requireNonNull(Bukkit.getServer().getWorld("world")).getBlockAt(x, y, z).setType(m);
+        }
+    }
+
+    public static Chunk makeRegion(Location centerPoint, Integer radius) {
+        double x = Double.parseDouble(centerPoint.getX());
+        double y = Double.parseDouble(centerPoint.getY());
+        double z = Double.parseDouble(centerPoint.getZ());
+        return null;
     }
 }

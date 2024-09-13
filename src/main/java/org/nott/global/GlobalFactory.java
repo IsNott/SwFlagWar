@@ -1,18 +1,19 @@
 package org.nott.global;
 
 
+
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
 
 /**
  * @author Nott
  * @date 2024-9-9
  */
 public class GlobalFactory {
+
+    public static List<String> RUNNING_GAME_LOC = Collections.synchronizedList(new ArrayList<String>());
 
     public static final String PLUGIN_NAME = "SwFlagWar";
 
@@ -30,5 +31,4 @@ public class GlobalFactory {
 
     public static final String EXAMPLE_FILE = "example_war.yml";
 
-    public static List<String> RUNNING_GAME_LOC = Collections.synchronizedList(new ArrayList<String>());
 }

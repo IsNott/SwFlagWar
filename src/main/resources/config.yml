@@ -1,35 +1,9 @@
-# Reward PlaceHolder name
-ecoCoinName: 'sw_coin'
-
 flagWar:
-  # WAR Id
-  - UUID: 4c11b8f2-dc6d-4f1d-9eb6-e7292dfc8fa9
-    name: 'SW-Bank'
-    # Enable flag war worLdName
-    world: world
-    # xyz(type = number)
-    locations:
-      - '123 123 123'
-    # Time format: HH:MM
-    start: '12:00'
-    end: '13:00'
-    # Optional War active days in week.
-    days: []
-    # Optional Require kingdoms type
-    types: [ ]
-    # Reward type: Execute Command / Item / Exp / effect
-    rewards:
-      - type:
-          - 1
-          - 2
-          - 3
-        command: 'ecoitems give %player_name% %eco_coin_name% %s'
-        material: ''
-        level-up: 0
-        amount: 5
-        effect: ''
-        period: HOUR
-        period-val: 1
-        must-stand-on: false
-
+  # 1 < radius,default 10
+  game_radius: 12
+  my_coin_name: 'sw_coin'
+  # if remind player before flag war game open
+  need_remind: true
+  before_start_remind: 5
+  remind_interval: 300
 

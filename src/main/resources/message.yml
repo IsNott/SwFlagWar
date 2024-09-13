@@ -31,6 +31,8 @@ war:
   date_format_error: '输入时间有误'
   war_name: '战争名称'
   loc_info: '所在位置'
+  start_schedule: '开始调度占领战争'
+  nothing_schedule: '没有可用的占领战争配置，调度结束'
   war_open_tip: '占领战争即将在%s开始，位置：%s，将于%s结束'
   war_starting_tip: '占领战争已经开始，位置：%s，将于%s结束'
 

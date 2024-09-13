@@ -10,6 +10,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,6 +20,7 @@ import org.nott.manager.FlagWarManager;
 import org.nott.utils.SwUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -28,6 +30,8 @@ import java.util.logging.Logger;
 public class SwFlagWar extends JavaPlugin {
 
     public final Logger swLogger = super.getLogger();
+
+
 
     @Override
     public void onDisable() {

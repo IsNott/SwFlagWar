@@ -1,14 +1,15 @@
 package org.nott.manager;
 
 import lombok.Data;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.nott.event.FlagWarOpenEvent;
+import org.nott.global.Formatter;
 import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
 import org.nott.model.Location;
@@ -20,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +52,10 @@ public class FlagWarManager implements Manager {
         setLogger(spigot.getLogger());
 
         List<War> wars = convertWarList();
-        logger.info("开始调度占领战争");
+        YamlConfiguration messageConfig = SwUtil.loadPlugFile(GlobalFactory.MESSAGE_YML);
+        logger.info(SwUtil.retMessage(messageConfig,GlobalFactory.WAR_MESSAGE_SUFFIX,"start_schedule"));
         if (SwUtil.isEmpty(wars)) {
-            logger.info("没有可用的占领战争配置，调度结束");
+            logger.info(SwUtil.retMessage(messageConfig,GlobalFactory.WAR_MESSAGE_SUFFIX,"nothing_schedule"));
             return;
         }
         // 异步加载战争
@@ -79,34 +80,27 @@ public class FlagWarManager implements Manager {
 
     public void remindWarGame(boolean instantly, War war) {
         Plugin spigot = getPlugin();
-        Server server = spigot.getServer();
 
         BukkitScheduler bukkitScheduler = spigot.getServer().getScheduler();
         bukkitScheduler.runTaskAsynchronously(spigot, () -> {
             try {
-
-                List<Location> locations = war.getLocations();
-                if (SwUtil.isEmpty(locations)) {
-                    SwUtil.log("对应的FlagWar没有位置信息");
-                    return;
-                }
-                YamlConfiguration msgFile = SwUtil.loadPlugFile(GlobalFactory.MESSAGE_YML);
                 String start = war.getStart();
                 String end = war.getEnd();
-                String warOpenTip = msgFile.getString("war.war_open_tip");
-                String warStartingTip = msgFile.getString("war.war_starting_tip");
+
                 LocalTime now = LocalTime.now();
-                DateTimeFormatter hour = DateTimeFormatter.ofPattern("HH:mm");
-                LocalTime startTime = LocalTime.parse(start, hour);
-                LocalTime endTime = LocalTime.parse(end, hour);
+                LocalTime startTime = LocalTime.parse(start, Formatter.DATE.DATE_TIME_HOUR);
+                LocalTime endTime = LocalTime.parse(end, Formatter.DATE.DATE_TIME_HOUR);
+
                 FLAG_WAR_MAP.remove(war.getUUID());
                 SCHEDULE_WAR_MAP.remove(war.getUUID());
 
+                war.setParseEndTime(endTime);
+                war.setParseStartTime(startTime);
                 //  Load/Schedule War Map
                 if (instantly || startTime.isBefore(now)) {
-                    loadWar2mapInstantly(war, locations, warStartingTip, start, end, server);
+                    loadWar2mapInstantly(war);
                 } else {
-                    loadWar2mapSchedule(war, locations, warOpenTip, endTime, now);
+                    loadWar2mapSchedule(war, endTime, now);
                 }
             } catch (Exception e) {
                 SwUtil.logThrow(e);
@@ -114,33 +108,21 @@ public class FlagWarManager implements Manager {
         });
     }
 
-    private void loadWar2mapSchedule(War war, List<Location> locations, String warStartingTip, LocalTime end, LocalTime now) throws InterruptedException {
+    private void loadWar2mapSchedule(War war, LocalTime end, LocalTime now) throws InterruptedException {
         Plugin spigot = getPlugin();
         Server server = spigot.getServer();
         BukkitScheduler scheduler = server.getScheduler();
-        for (Location location : locations) {
-            String formatMsg = String.format(warStartingTip, location.toString(), end);
-            server.spigot().broadcast(TextComponent.fromLegacy(ChatColor.GREEN + formatMsg));
-            scheduler.runTaskLater(spigot, () -> loadWarGame2Map(war), Duration.between(now, end).toMillis() / 20);
-            Thread.sleep(Duration.ofSeconds(1));
-        }
+        scheduler.runTaskLater(spigot, () -> {
+            loadWar2mapInstantly(war);
+        }, Duration.between(now, end).toMillis() / 20);
     }
 
-    private void loadWar2mapInstantly(War war, List<Location> locations, String warOpenTip, String start, String end, Server server) throws InterruptedException {
-        for (Location location : locations) {
-            String formatMsg = String.format(warOpenTip, start, location.toString(), end);
-            server.spigot().broadcast(TextComponent.fromLegacy(ChatColor.GREEN + formatMsg));
-            loadWarGame2Map(war);
-            Thread.sleep(Duration.ofSeconds(1));
-        }
+    private void loadWar2mapInstantly(War war) {
+        FlagWarOpenEvent event = new FlagWarOpenEvent(war);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
-    public void loadWarGame2Map(War war) {
-        FLAG_WAR_MAP.put(war.getUUID(), war);
-    }
-
-    public void loadWarGame2Map(YamlConfiguration warConfig) {
-        War war = parseWarPoJo(warConfig);
+    public static void loadWarGame2Map(War war) {
         FLAG_WAR_MAP.put(war.getUUID(), war);
     }
 
@@ -186,7 +168,7 @@ public class FlagWarManager implements Manager {
                 continue;
             }
             for (String location : locations) {
-                String[] splitStr = location.split(" ");
+                String[] splitStr = location.split(KeyWord.COMMON.WHITER_SPACE);
                 if (splitStr.length != 3) {
                     continue;
                 }

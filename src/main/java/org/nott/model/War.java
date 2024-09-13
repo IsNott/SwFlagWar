@@ -2,6 +2,7 @@ package org.nott.model;
 
 import lombok.Data;
 
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -22,6 +23,10 @@ public class War {
     private String start;
 
     private String end;
+
+    private LocalTime parseStartTime;
+
+    private LocalTime parseEndTime;
 
     private List<Integer> days;
 

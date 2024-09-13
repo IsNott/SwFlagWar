@@ -31,6 +31,9 @@ public interface KeyWord {
         public static final String REWARDS_PERIOD = "rewards.period";
         public static final String REWARDS_PERIOD_VAL  = "rewards.period-val";
         public static final String REWARDS_MUST_STAND_ON  = "rewards.must-stand-on";
+        public static final String WAR_STARTING_TIP = "war.war_starting_tip";
+        public static final String WAR_OPEN_TIP = "war.war_open_tip";
+        public static final String FW_HELP = "/fw help";
     }
 
     public interface COMMON{
@@ -39,6 +42,9 @@ public interface KeyWord {
         public static final String OP = "op";
         public static final String PLAYER = "player";
         public static final String RELOAD = "reload";
+        public static final String WHITER_SPACE = " ";
+        public static final String COMMA = ",";
+        public static final String COLON = ":";
     }
 
     public interface PERMISSION{
