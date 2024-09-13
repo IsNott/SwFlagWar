@@ -1,6 +1,7 @@
 package org.nott.model;
 
 import lombok.Data;
+import org.nott.global.KeyWord;
 
 /**
  * @author Nott
@@ -23,8 +24,6 @@ public class Location {
 
     @Override
     public String toString() {
-        return "x='" + x + '\'' +
-                        ", y='" + y + '\'' +
-                        ", z='" + z + '\'';
+        return " [" + x + KeyWord.COMMON.WHITER_SPACE + y + KeyWord.COMMON.WHITER_SPACE + z + " ]";
     }
 }

@@ -1,17 +1,22 @@
 package org.nott.listener;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.nott.event.FlagWarOpenEvent;
@@ -41,6 +46,7 @@ public class SwFlagWarListener implements Listener {
 
     private ConcurrentHashMap<UUID,String> PLAYER_IN_WAR_ZONE = new ConcurrentHashMap<>();
 
+    // Listening Flag war game open and broadcast remind message.
     @EventHandler(priority = EventPriority.NORMAL)
     public void onFlagWarOpenEvent(FlagWarOpenEvent flagWarOpenEvent){
         War war = flagWarOpenEvent.getWar();
@@ -63,7 +69,7 @@ public class SwFlagWarListener implements Listener {
         });
     }
 
-    // Check If Player enter opening flag war game zone.
+    // Check if player enter opening flag war game zone.
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerWalkEvent(PlayerMoveEvent event){
         if(FlagWarManager.STARTED_WAR_MAP.isEmpty()){
@@ -94,6 +100,7 @@ public class SwFlagWarListener implements Listener {
         });
     }
 
+    // Check if player place occupy block on flag war game zone.
     @EventHandler(priority = EventPriority.NORMAL)
     public void onBlockPlaceEvent(BlockPlaceEvent event){
         if(!PLAYER_IN_WAR_ZONE.containsKey(event.getPlayer().getUniqueId())){
@@ -101,6 +108,23 @@ public class SwFlagWarListener implements Listener {
         }
         Block block = event.getBlock();
         //todo When Player on Flag war game zone place an item and starting to count down time.
+    }
+
+    // Drop player head probability while death.
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerDeathEvent(PlayerDeathEvent event){
+        YamlConfiguration config = FlagWarExecutor.CONFIG_YML_FILE;
+        double probability = config.getDouble("drop_head.probability", 0.5);
+        if (probability < RandomUtils.nextDouble(0.0, probability)) {
+            return;
+        }
+        // Drop player's head
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
+        SkullMeta sm = (SkullMeta) item.getItemMeta();
+        assert sm != null;
+        sm.setOwningPlayer(event.getEntity());
+        item.setItemMeta(sm);
+        event.getDrops().add(item);
     }
 
 }

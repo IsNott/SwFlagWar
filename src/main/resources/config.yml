@@ -20,7 +20,18 @@ flagWar:
   my_coin_name: 'sw_coin'
   # if remind player before flag war game open
   need_remind: true
+  # Before flag war game start remind count
   before_start_remind: 5
+  # Remind interval
   remind_interval: 300
+  # Item using to join flag war
   occupy_item:
+
+offer:
+  cost_before: true
+  tax: 0
+
+drop_head:
+  # When player death drops head,set 1 = 100%,default 0.5
+  probability: 0.5
 
