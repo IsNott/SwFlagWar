@@ -17,20 +17,11 @@ eula.txt
 cache/
 config/
 libraries/
-logs/
-world/
-world_nether/
-world_the_end/
-plugins/
-/cache/
-/config/
-/libraries/
-/logs/
-/world/
-/world_nether/
-/world_the_end/
-/plugins/
-eula.txt
+logs
+world
+world_nether
+world_the_end
+plugins
 banned-ips.json
 banned-players.json
 commands.yml
@@ -45,7 +36,7 @@ spigot.yml
 usercache.json
 version_history.json
 whitelist.json
-versions/
+versions
 
 
 ### Eclipse ###
