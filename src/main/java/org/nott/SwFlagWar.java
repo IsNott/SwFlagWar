@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.nott.executor.FlagWarExecutor;
 import org.nott.executor.OfferExecutor;
 import org.nott.global.GlobalFactory;
@@ -46,7 +47,7 @@ public class SwFlagWar extends JavaPlugin {
         PluginManager pluginManager = this.getServer().getPluginManager();
         YamlConfiguration message = new YamlConfiguration();
         try {
-            message.load(new File(GlobalFactory.MESSAGE_YML));
+            message.load(this.getTextResource(GlobalFactory.MESSAGE_YML));
         } catch (IOException | InvalidConfigurationException e) {
             throw new RuntimeException(e);
         }

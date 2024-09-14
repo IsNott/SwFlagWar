@@ -29,6 +29,8 @@ public interface KeyWord {
         public static final String REWARDS_AMOUNT  = "rewards.amount";
         public static final String REWARDS_EFFECT  = "rewards.effect";
         public static final String REWARDS_PERIOD = "rewards.period";
+        public static final String REWARDS_PERIOD_VAL  = "rewards.period-val";
+        public static final String REWARDS_MUST_STAND_ON  = "rewards.must-stand-on";
         public static final String FW_HELP = "/fw help";
     }
 
@@ -42,8 +44,6 @@ public interface KeyWord {
         public static final String DROP_HEAD_PROB = "drop.head.probability";
         public static final String DROP_STEAL_PROB = "drop.steal.probability";
         public static final String DROP_STEAL_MAX = "drop.steal.max";
-        public static final String REWARDS_PERIOD_VAL  = "rewards.period-val";
-        public static final String REWARDS_MUST_STAND_ON  = "rewards.must-stand-on";
         public static final String WAR_STARTING_TIP = "war.war_starting_tip";
         public static final String REG_OFFER = "registry.offer_success";
         public static final String REG_DEATH = "registry.death_success";
@@ -53,6 +53,7 @@ public interface KeyWord {
     public interface COMMON{
         public static final String HELP = "help";
         public static final String NEXT = "next";
+        public static final String UNKNOWN_COMMAND = "unknown_command";
         public static final String OP = "op";
         public static final String PLAYER = "player";
         public static final String RELOAD = "reload";

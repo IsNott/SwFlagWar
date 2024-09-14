@@ -22,11 +22,13 @@ flag_war:
   # if remind player before flag war game open
   need_remind: true
   # Before flag war game start remind count
-  before_start_remind: 5
+  before_start_remind: 10
   # Remind interval
-  remind_interval: 300
+  remind_interval: 30
   # Item using to join flag war
-  occupy_item:
+  occupy_item: CRYING_OBSIDIAN
+  # Time for occupied a flag war zone.
+  occupy_time: 600
 
 offer:
   enable: true

@@ -1,10 +1,13 @@
 package org.nott.utils;
 
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -179,6 +182,12 @@ public class SwUtil{
         Bukkit.spigot().broadcast(
                 TextComponent.fromLegacy(msg + color)
         );
+    }
+
+    public static BarColor randomBukkitBossBarColor(){
+        List<BarColor> list = Arrays.asList(BarColor.values());
+        int index = RandomUtils.nextInt(0, list.size() - 1);
+        return list.get(index);
     }
 
     public static void makeCircle(Location loc, Integer radius, Material m) {

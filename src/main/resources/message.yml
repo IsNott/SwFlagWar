@@ -11,10 +11,8 @@ war:
     - '移除占领战争 /fw del <战争名称>'
     - '取消所有战争 /fw cancel all'
     - '取消某个战争 /fw cancel <战争名称>'
-    - '添加战争地址 /fw loc add <位置> <战争名称> '
-    - '查看战争位置 /fw loc list <战争名称> '
-    - '删除战争位置 /fw loc remove <战争名称> <位置列表索引>'
-    - '改变战争位置 /fw loc reset <战争名称> <索引> <位置>'
+    - '查看战争位置 /fw loc <战争名称> '
+    - '改变战争位置 /fw loc reset <战争名称> <位置>'
     - '改变战争时间 /fw settime <战争名称> <开始时间> <结束时间>'
     - '改变战争生效日期 /fw days <天数，以空格分隔>'
     - '改变战争生效王国主义 /fw types <类型，以空格分隔>'
@@ -25,6 +23,11 @@ war:
     - '设置周期单位 /fw period set <周期>'
     - '设置周期单位值 /fw periodval set <值>'
     - '是否在战争范围内才能获取奖励 /fw muststandon set <boolean>'
+
+
+  # Useless for now.
+#    - '添加战争地址 /fw loc add <位置> <战争名称> '
+#    - '删除战争位置 /fw loc remove <战争名称> <位置列表索引>'
   player:
     - '查看战争列表：/fw list'
   create_success: '战争创建成功'
@@ -37,12 +40,15 @@ war:
   date_format_error: '输入时间有误'
   war_name: '战争名称'
   loc_info: '所在位置'
+  war_show_info: '战争名称：[],所在位置：[]'
   start_schedule: '开始调度占领战争'
   nothing_schedule: '没有可用的占领战争配置，调度结束'
   war_open_tip: '占领战争即将在%s开始，位置：%s，将于%s结束'
   war_starting_tip: '占领战争已经开始，位置：%s，将于%s结束'
   enter_zone: '你已进入占领战争区域，放置占领物开始占领'
   leave_zone: '你已离开占领战争区域'
+  start_occupy: '玩家[%s]在%[s]放置了占领物，将于%s分钟后完成占领'
+  process_title: '王国[%s]正在占领该地，剩余时间[%s]'
 
 death_drop:
   inventory: 'PVP死亡裁决触发，随机掉落了%s格背包物品'
@@ -56,6 +62,7 @@ common:
   exception: '发生内部异常，查看控制台日志以检查'
   wrong_page: '传入的页码数有误'
   no_more_info: '没有更多信息了'
+  unknown_command: '未知命令'
 
 registry:
   offer_success: '悬赏模块注册成功'
