@@ -13,12 +13,10 @@ import org.jetbrains.annotations.NotNull;
  * @date 2024-9-11
  */
 @Data
-public class OfferExecutor implements CommandExecutor {
-
-    private Plugin plugin;
+public class OfferExecutor extends AbstractExecutor implements CommandExecutor {
 
     public OfferExecutor(Plugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override

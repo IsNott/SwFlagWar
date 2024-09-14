@@ -22,6 +22,14 @@ world/
 world_nether/
 world_the_end/
 plugins/
+/cache/
+/config/
+/libraries/
+/logs/
+/world/
+/world_nether/
+/world_the_end/
+/plugins/
 eula.txt
 banned-ips.json
 banned-players.json
