@@ -46,6 +46,10 @@ public class SwUtil{
         return collection != null && !collection.isEmpty();
     }
 
+    public static <T> boolean isNotNull(T[] arrays){
+        return arrays != null && arrays.length > 0;
+    }
+
     public static boolean isNotNull(Object obj){
         return obj != null && !"".equals(obj);
     }
@@ -201,9 +205,9 @@ public class SwUtil{
         Block centerPointBlock = defWorld.getBlockAt((int) x, (int) y, (int) z);
         Objects.requireNonNull(centerPointBlock);
         centerPointBlock.setType(m);
-
+        Chunk chunk = centerPointBlock.getChunk();
         // Get a chuck by block
-        return centerPointBlock.getChunk();
+        return chunk;
     }
 
     public static boolean isInChunkZone(org.bukkit.Location currLoc, Chunk chunk) {

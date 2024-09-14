@@ -1,25 +1,16 @@
 package org.nott.listener;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.nott.event.FlagWarOpenEvent;
@@ -31,10 +22,7 @@ import org.nott.model.Location;
 import org.nott.model.War;
 import org.nott.utils.SwUtil;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -57,13 +45,13 @@ public class SwFlagWarListener implements Listener {
         String end = war.getEnd();
         List<Location> locations = war.getLocations();
 
-        String tipMsg = SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE, KeyWord.WAR.WAR_STARTING_TIP);
+        String tipMsg = SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE, KeyWord.CONFIG.WAR_STARTING_TIP);
 
         locations.forEach(loc ->{
 //            SwUtil.makeCircle(loc,FlagWarExecutor.CONFIG_YML_FILE.getInt("flagWar.game_radius",10), Material.BEDROCK);
             Chunk chunk = SwUtil.makeRegion(loc, Material.BEDROCK);
             war.setChunk(chunk);
-            String formatMsg = String.format(tipMsg, start, loc, end);
+            String formatMsg = String.format(tipMsg, start, end);
             SwUtil.broadcast(
                     formatMsg,
                     ChatColor.GOLD
@@ -89,6 +77,7 @@ public class SwFlagWarListener implements Listener {
                 String key = iterator.next();
                 War war = FlagWarManager.STARTED_WAR_MAP.get(key);
                 Chunk chunk = war.getChunk();
+                // TODO SwUtils.isInChunk Cannot check if player entering game zone.
                 if (!SwUtil.isInChunkZone(from,chunk) && SwUtil.isInChunkZone(eventTo, chunk)) {
                     PLAYER_IN_WAR_ZONE.put(player.getUniqueId(),"");
                     player.sendTitle(null,SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE,"enter_zone"),20,70,20);
@@ -111,32 +100,6 @@ public class SwFlagWarListener implements Listener {
         }
         Block block = event.getBlock();
         //todo When Player on Flag war game zone place an item and starting to count down time.
-    }
-
-    // Drop player head probability while death.
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerDeathEvent(PlayerDeathEvent event){
-        Player entity = event.getEntity();
-        EntityDamageEvent lastDamageCause = entity.getLastDamageCause();
-        if(lastDamageCause instanceof EntityDamageByEntityEvent){
-            EntityDamageByEntityEvent damageCause = (EntityDamageByEntityEvent) lastDamageCause;
-            Entity damageCauseEntity = damageCause.getEntity();
-            if(!(damageCauseEntity instanceof Player)){
-                return;
-            }
-            YamlConfiguration config = FlagWarExecutor.CONFIG_YML_FILE;
-            double probability = config.getDouble("drop_head.probability", 0.5);
-            if (probability < RandomUtils.nextDouble(0.0, 1.0)) {
-                return;
-            }
-            // Drop player's head
-            ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
-            SkullMeta sm = (SkullMeta) item.getItemMeta();
-            assert sm != null;
-            sm.setOwningPlayer(entity);
-            item.setItemMeta(sm);
-            event.getDrops().add(item);
-        }
     }
 
 }

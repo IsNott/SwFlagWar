@@ -23,6 +23,8 @@ public class GlobalFactory {
 
     public static final String FW_COMMAND = "flagwar";
 
+    public static final String OFFER_COMMAND = "offer";
+
     public static final String COMMON_MSG_SUFFIX = "common";
 
     public static final String WAR_MESSAGE_SUFFIX = "war";
