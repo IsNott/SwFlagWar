@@ -39,8 +39,8 @@ public interface KeyWord {
         public static final String FLAG_ENABLE = "flag_war.enable";
         public static final String OFFER_ENABLE = "offer.enable";
         public static final String DROP_ENABLE = "drop.enable";
-        public static final String DROP_INVENTORY = "drop.inventory";
-        public static final String DROP_HEAD = "drop.head";
+        public static final String DROP_INVENTORY = "death_drop.inventory";
+        public static final String DROP_HEAD = "death_drop.head";
         public static final String DROP_HEAD_PROB = "drop.head.probability";
         public static final String DROP_STEAL_PROB = "drop.steal.probability";
         public static final String DROP_STEAL_MAX = "drop.steal.max";

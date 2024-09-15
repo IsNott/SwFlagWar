@@ -52,7 +52,7 @@ public class SwDeathListener implements Listener {
         if (probability < RandomUtils.nextDouble(0.0, 1.0)) {
             return;
         }
-        int dropInvCount = RandomUtils.nextInt(1, config.getInt(KeyWord.CONFIG.DROP_STEAL_PROB, 3));
+        int dropInvCount = RandomUtils.nextInt(1, config.getInt(KeyWord.CONFIG.DROP_STEAL_MAX, 3));
         PlayerInventory inventory = dead.getInventory();
         ItemStack[] contents = inventory.getContents();
         int contentLength = contents.length;
@@ -73,7 +73,7 @@ public class SwDeathListener implements Listener {
                 drops.add(contents[removeIndex]);
             }
             if(SwUtil.isEmpty(drops))return;
-            inventory.removeItem(drops.toArray(new ItemStack[]{}));
+            inventory.removeItem(drops.toArray(new ItemStack[drops.size()]));
             event.getDrops().addAll(drops);
         }
         SwUtil.spigotTextMessage(dead.spigot()

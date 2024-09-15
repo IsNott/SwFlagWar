@@ -15,7 +15,7 @@
 # =============================================================================================================
 # =============================================================================================================   
 flag_war:
-  enable: true
+  enable: false
   # 1 < radius,default 10
   #  game_radius: 12
   my_coin_name: 'sw_coin'
@@ -31,7 +31,7 @@ flag_war:
   occupy_time: 600
 
 offer:
-  enable: true
+  enable: false
   cost_before: true
   tax: 0
 
