@@ -20,13 +20,13 @@ public class FlagWarOpenEvent extends Event implements Cancellable {
 
     private boolean isCancelled;
 
-    private boolean async = true;
+    private boolean async = false;
 
     private static final HandlerList HANDLERS = new HandlerList();
 
 
     public FlagWarOpenEvent() {
-        super(true);
+        super(false);
     }
 
     @NotNull

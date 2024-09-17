@@ -1,14 +1,17 @@
 package org.nott;
 
 
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.nott.executor.FlagWarExecutor;
 import org.nott.executor.OfferExecutor;
+import org.nott.executor.SwMoneyExecutor;
 import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
 import org.nott.listener.SwDeathListener;
@@ -54,6 +57,7 @@ public class SwFlagWar extends JavaPlugin {
         if (config.getBoolean(KeyWord.CONFIG.FLAG_ENABLE)) {
             File[] files = file.listFiles();
             if(SwUtil.isNotNull(files)) {
+                pluginManager.registerEvents(new SwFlagWarListener(),this);
                 FlagWarManager flagWarManager = new FlagWarManager(this);
                 try {
                     flagWarManager.doManage();
@@ -61,7 +65,6 @@ public class SwFlagWar extends JavaPlugin {
                     throw new RuntimeException(e);
                 }
             }
-            pluginManager.registerEvents(new SwFlagWarListener(),this);
             Objects.requireNonNull(this.getCommand(GlobalFactory.FW_COMMAND)).setExecutor(new FlagWarExecutor(this));
             swLogger.info(message.getString(KeyWord.CONFIG.REG_FLAG));
         }
@@ -69,6 +72,16 @@ public class SwFlagWar extends JavaPlugin {
             pluginManager.registerEvents(new SwDeathListener(), this);
             swLogger.info(message.getString(KeyWord.CONFIG.REG_DEATH));
         }
+
+        if(config.getBoolean("money.enable")){
+            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+            if (rsp == null) {
+                return;
+            }
+            Objects.requireNonNull(this.getCommand(GlobalFactory.SW_COMMAND)).setExecutor(new SwMoneyExecutor(this));
+            swLogger.info("SimpleWorld经济模块加载成功");
+        }
+
         if(config.getBoolean(KeyWord.CONFIG.OFFER_ENABLE)){
             Objects.requireNonNull(this.getCommand(GlobalFactory.OFFER_COMMAND)).setExecutor(new OfferExecutor(this));
             swLogger.info(message.getString(KeyWord.CONFIG.REG_OFFER));

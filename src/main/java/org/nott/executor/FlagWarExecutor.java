@@ -293,7 +293,8 @@ public class FlagWarExecutor extends AbstractExecutor implements CommandExecutor
             if (SwUtil.isNotNull(player)) {
                 Location location = player.getLocation();
                 double x = location.getX();
-                double y = location.getY();
+                // Use player stand loc.
+                double y = location.getY() - 1;
                 double z = location.getZ();
                 loc = x + KeyWord.COMMON.WHITER_SPACE + y + KeyWord.COMMON.WHITER_SPACE + z;
                 world = player.getWorld().getName();
@@ -341,19 +342,31 @@ public class FlagWarExecutor extends AbstractExecutor implements CommandExecutor
 
     private boolean executeReloadCommand(@NotNull CommandSender commandSender, @NotNull String @NotNull [] args, Plugin spigot) {
         if (args.length == 1 && KeyWord.COMMON.RELOAD.equals(args[0])) {
-            scheduler.runTaskAsynchronously(spigot, () -> {
-                spigot.saveConfig();
-                loadMessageYamlFile();
-                // load war file
-                try {
-                    new FlagWarManager(spigot).doManage();
-                } catch (Exception e) {
-                    SwUtil.logThrow(e);
-                }
+//            scheduler.runTaskAsynchronously(spigot, () -> {
+//                spigot.saveConfig();
+//                loadMessageYamlFile();
+//                // load war file
+//                try {
+//                    new FlagWarManager(spigot).doManage();
+//                } catch (Exception e) {
+//                    SwUtil.logThrow(e);
+//                }
+//
+//                // call the callback with the result
+//                commandSender.spigot().sendMessage(TextComponent.fromLegacy(net.md_5.bungee.api.ChatColor.GREEN + SwUtil.retMessage(MESSAGE_YML_FILE, GlobalFactory.COMMON_MSG_SUFFIX, "reloaded")));
+//            });
 
-                // call the callback with the result
-                commandSender.spigot().sendMessage(TextComponent.fromLegacy(net.md_5.bungee.api.ChatColor.GREEN + SwUtil.retMessage(MESSAGE_YML_FILE, GlobalFactory.COMMON_MSG_SUFFIX, "reloaded")));
-            });
+            spigot.saveConfig();
+            loadMessageYamlFile();
+            // load war file
+            try {
+                new FlagWarManager(spigot).doManage();
+            } catch (Exception e) {
+                SwUtil.logThrow(e);
+            }
+
+            // call the callback with the result
+            commandSender.spigot().sendMessage(TextComponent.fromLegacy(net.md_5.bungee.api.ChatColor.GREEN + SwUtil.retMessage(MESSAGE_YML_FILE, GlobalFactory.COMMON_MSG_SUFFIX, "reloaded")));
 
             return true;
         }

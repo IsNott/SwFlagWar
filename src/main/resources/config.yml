@@ -29,11 +29,22 @@ flag_war:
   occupy_item: CRYING_OBSIDIAN
   # Time for occupied a flag war zone.
   occupy_time: 600
-
+  # Flag war game zone radius. default 4
+  game_radius: 4
 offer:
   enable: false
   cost_before: true
   tax: 0
+
+money:
+  enable: true
+  def: 0
+
+online:
+  enable: true
+  period: HOUR
+  period_val: 1
+  money: 300
 
 drop:
   enable: true

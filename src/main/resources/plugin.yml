@@ -17,6 +17,10 @@ commands:
     description: '悬赏系统'
     usage: '未知命令，使用/<command> help 查看帮助'
     aliases: 'of'
+  simpleworld:
+    description: 'SW经济系统'
+    usage: '未知命令，使用/<command> help 查看帮助'
+    aliases: 'sw'
 
 permissions:
   flagwar.player:
@@ -28,3 +32,9 @@ permissions:
   offer.player:
     description: 悬赏-玩家权限
     default: true
+  simpleworld.player:
+    description: SW经济-玩家权限
+    default: true
+  simpleworld.op:
+    description: SW经济-管理员权限
+    default: op

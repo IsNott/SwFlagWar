@@ -7,11 +7,9 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,43 +30,43 @@ import java.util.logging.Logger;
  * @date 2024-9-9
  */
 
-public class SwUtil{
+public class SwUtil {
 
     static Plugin plugin = Bukkit.getPluginManager().getPlugin(GlobalFactory.PLUGIN_NAME);
 
-    public static boolean hasPlugin(String plugins){
+    public static boolean hasPlugin(String plugins) {
         Plugin plugin = Bukkit.getPluginManager().getPlugin(plugins);
         return plugin != null;
     }
 
-    public static Plugin getPlugin(String plugins){
+    public static Plugin getPlugin(String plugins) {
         return Bukkit.getPluginManager().getPlugin(plugins);
     }
 
-    public static boolean isNotNull(Collection collection){
+    public static boolean isNotNull(Collection collection) {
         return collection != null && !collection.isEmpty();
     }
 
-    public static <T> boolean isNotNull(T[] arrays){
+    public static <T> boolean isNotNull(T[] arrays) {
         return arrays != null && arrays.length > 0;
     }
 
-    public static boolean isNotNull(Object obj){
+    public static boolean isNotNull(Object obj) {
         return obj != null && !"".equals(obj);
     }
 
-    public static boolean isEmpty(Collection collection){
+    public static boolean isEmpty(Collection collection) {
         return !isNotNull(collection);
     }
 
-    public static <T> boolean arrayNotEmpty(T[] arrays){
+    public static <T> boolean arrayNotEmpty(T[] arrays) {
         return arrays != null && arrays.length > 0;
     }
 
-    public static String retMessage(@NotNull FileConfiguration msgFile, @Nullable String parentPath, @NotNull String path){
-        if(StringUtils.isNotEmpty(parentPath)){
+    public static String retMessage(@NotNull FileConfiguration msgFile, @Nullable String parentPath, @NotNull String path) {
+        if (StringUtils.isNotEmpty(parentPath)) {
             return Objects.requireNonNull(msgFile.getConfigurationSection(parentPath)).getString(path);
-        }else {
+        } else {
             return msgFile.getString(path);
         }
     }
@@ -77,14 +75,14 @@ public class SwUtil{
         return msgFile.getString(path);
     }
 
-    public static File[] getPluginFiles(String path){
-        File file = new File(plugin.getDataFolder(),path);
+    public static File[] getPluginFiles(String path) {
+        File file = new File(plugin.getDataFolder(), path);
         return file.listFiles();
     }
 
 
-    public static boolean fileIsExist(String path){
-        File file = new File(plugin.getDataFolder(),path);
+    public static boolean fileIsExist(String path) {
+        File file = new File(plugin.getDataFolder(), path);
         return file.exists();
     }
 
@@ -97,7 +95,7 @@ public class SwUtil{
 
 
     public static boolean checkLocation(String[] xyz) {
-        if(xyz.length == 3){
+        if (xyz.length == 3) {
             try {
                 for (String single : xyz) {
                     Double.parseDouble(single);
@@ -110,22 +108,22 @@ public class SwUtil{
         return false;
     }
 
-    public static YamlConfiguration loadPlugFile(String path) throws Exception{
-        File file = new File(plugin.getDataFolder(),path);
+    public static YamlConfiguration loadPlugFile(String path) throws Exception {
+        File file = new File(plugin.getDataFolder(), path);
         YamlConfiguration configuration = new YamlConfiguration();
         configuration.load(file);
         return configuration;
     }
 
-    public static void logThrow(Throwable e) throws RuntimeException{
+    public static void logThrow(Throwable e) throws RuntimeException {
         Logger logger = plugin.getLogger();
-        logger.log(Level.ALL,e.getMessage(),e);
+        logger.log(Level.ALL, e.getMessage(), e);
         throw new RuntimeException(e);
     }
 
-    public static void log(String msg){
+    public static void log(String msg) {
         Logger logger = plugin.getLogger();
-        logger.log(Level.ALL,msg);
+        logger.log(Level.ALL, msg);
     }
 
     public static boolean checkHourStr(String timeStr) {
@@ -137,7 +135,7 @@ public class SwUtil{
         return true;
     }
 
-    public static boolean hourIsBefore(String time1,String time2){
+    public static boolean hourIsBefore(String time1, String time2) {
         Date hour1 = null;
         Date hour2 = null;
         try {
@@ -150,7 +148,7 @@ public class SwUtil{
 
     }
 
-    public static <T> Map<String,Object> convertMap(T obj){
+    public static <T> Map<String, Object> convertMap(T obj) {
         Map<String, Object> map = null;
         try {
             map = new HashMap<String, Object>();
@@ -178,13 +176,13 @@ public class SwUtil{
         );
     }
 
-    public static void broadcast(String msg,ChatColor color){
+    public static void broadcast(String msg, ChatColor color) {
         Bukkit.spigot().broadcast(
-                TextComponent.fromLegacy(msg + color)
+                TextComponent.fromLegacy(msg, color.asBungee())
         );
     }
 
-    public static BarColor randomBukkitBossBarColor(){
+    public static BarColor randomBukkitBossBarColor() {
         List<BarColor> list = Arrays.asList(BarColor.values());
         int index = RandomUtils.nextInt(0, list.size() - 1);
         return list.get(index);
@@ -219,6 +217,45 @@ public class SwUtil{
         return chunk;
     }
 
+    public static void makeSquare(Location centerPointLoc, Integer radius, Material m) {
+        double x = Double.parseDouble(centerPointLoc.getX());
+        double y = Double.parseDouble(centerPointLoc.getY());
+        double z = Double.parseDouble(centerPointLoc.getZ());
+        int intX = (int) x;
+        int intY = (int) y;
+        int intZ = (int) z;
+        // Mark Flag war game center point.
+        World defWorld = Bukkit.getServer().getWorld("world");
+        Block block = null;
+        Block centerPointBlock = defWorld.getBlockAt(intX, intY, intZ);
+        centerPointBlock.setType(m);
+        Objects.requireNonNull(defWorld);
+        for (Integer i = 1; i < radius; i++) {
+            int xBlock = intX + i;
+            int xBlock1 = intX - i;
+            int zBlock = intZ + i;
+            int zBlock1 = intZ - i;
+            defWorld.getBlockAt(xBlock, intY, intZ).setType(m);
+            defWorld.getBlockAt(xBlock1, intY, intZ).setType(m);
+            defWorld.getBlockAt(intX, intY, zBlock).setType(m);
+            defWorld.getBlockAt(intX, intY, zBlock1).setType(m);
+            for (Integer j = 1; j < radius; j++) {
+                int XBlock = intX + i;
+                int XBlock1 = intX - i;
+                int ZBlock = intZ + i;
+                int ZBlock1 = intZ - i;
+                int XBlockj = intX + j;
+                int XBlockj1 = intX - j;
+                int ZBlockj = intZ + j;
+                int ZBlockj1 = intZ - j;
+                defWorld.getBlockAt(XBlock, intY, ZBlockj).setType(m);
+                defWorld.getBlockAt(XBlock1, intY, ZBlockj1).setType(m);
+                defWorld.getBlockAt(XBlockj1, intY, ZBlock).setType(m);
+                defWorld.getBlockAt(XBlockj, intY, ZBlock1).setType(m);
+            }
+        }
+    }
+
     public static boolean isInChunkZone(org.bukkit.Location currLoc, Chunk chunk) {
         double x = currLoc.getX();
         double y = currLoc.getY();
@@ -228,6 +265,35 @@ public class SwUtil{
         Block block = defWorld.getBlockAt((int) x, (int) y, (int) z);
         BlockData blockData = block.getBlockData();
         return chunk.contains(blockData);
+    }
+
+    public static boolean isInGameSquare(org.bukkit.Location toLoc, Location center, Integer gameRadius) {
+        double x = toLoc.getX();
+        double y = toLoc.getY();
+        double z = toLoc.getZ();
+        int pX = (int) Double.parseDouble(center.getX());
+        int pY = (int) Double.parseDouble(center.getY());
+        int pZ = (int) Double.parseDouble(center.getZ());
+
+        int gotoX = (int) x;
+        int gotoY = (int) y;
+        int gotoZ = (int) z;
+
+        World defWorld = Bukkit.getServer().getWorld("world");
+        Objects.requireNonNull(defWorld);
+
+        if (gotoY < pY) {
+            return false;
+        }
+
+        return (gotoX >= pX && gotoX <= (pX + gameRadius)) && (gotoZ > pZ && gotoZ <= (pZ + gameRadius))
+                ||
+                (gotoX <= pX && gotoX >= (pX - gameRadius)) && (gotoZ > pZ && gotoZ <= (pZ - gameRadius))
+                        ||
+                (gotoX >= pX && gotoX <= (pX + gameRadius)) && (gotoZ <= pZ && gotoZ >= (pZ - gameRadius))
+                ||
+                (gotoX <= pX && gotoX >= (pX - gameRadius)) && (gotoZ <= pZ && gotoZ >= (pZ - gameRadius));
+
     }
 }
 

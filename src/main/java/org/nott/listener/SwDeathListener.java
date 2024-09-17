@@ -16,12 +16,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.nott.executor.FlagWarExecutor;
+import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
 import org.nott.utils.SwUtil;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Nott
@@ -55,25 +58,31 @@ public class SwDeathListener implements Listener {
         int dropInvCount = RandomUtils.nextInt(1, config.getInt(KeyWord.CONFIG.DROP_STEAL_MAX, 3));
         PlayerInventory inventory = dead.getInventory();
         ItemStack[] contents = inventory.getContents();
-        int contentLength = contents.length;
-        if(contentLength == 0){
+        // Filter Player's armor and weapon(sword + bow + .....).
+        List<ItemStack> contentContainItem = Arrays.stream(contents)
+                .filter(Objects::nonNull)
+                .filter(r -> !GlobalFactory.NOT_DROPS_EQUIP.contains(r.getType()))
+                .collect(Collectors.toList());
+        int contentLength = contentContainItem.size();
+        if(SwUtil.isEmpty(contentContainItem) || contentLength == 0){
             return;
         }
         // Drop death player's item
         if (contentLength <= dropInvCount) {
-            inventory.removeItem(contents);
-            List<ItemStack> drops = Arrays.asList(contents);
-            event.getDrops().addAll(drops);
-            if(SwUtil.isEmpty(drops))return;
+            event.getDrops().addAll(contentContainItem);
+            if(SwUtil.isEmpty(contentContainItem))return;
             dropInvCount = contentLength;
+            inventory.removeItem(contentContainItem.toArray(new ItemStack[0]));
         }else {
             List<ItemStack> drops = new LinkedList<>();
             for (int i = 0; i < dropInvCount; i++) {
                 int removeIndex = RandomUtils.nextInt(0, contentLength);
-                drops.add(contents[removeIndex]);
+                ItemStack itemStack = contentContainItem.get(removeIndex);
+                drops.add(itemStack);
+                inventory.removeItem(itemStack);
             }
             if(SwUtil.isEmpty(drops))return;
-            inventory.removeItem(drops.toArray(new ItemStack[drops.size()]));
+            inventory.removeItem(drops.toArray(new ItemStack[0]));
             event.getDrops().addAll(drops);
         }
         SwUtil.spigotTextMessage(dead.spigot()
