@@ -55,6 +55,10 @@ public class SwUtil {
         return obj != null && !"".equals(obj);
     }
 
+    public static boolean isNull(Object obj){
+        return !isNotNull(obj);
+    }
+
     public static boolean isEmpty(Collection collection) {
         return !isNotNull(collection);
     }
@@ -124,6 +128,7 @@ public class SwUtil {
     public static void log(String msg) {
         Logger logger = plugin.getLogger();
         logger.log(Level.ALL, msg);
+        logger.info(msg);
     }
 
     public static boolean checkHourStr(String timeStr) {
@@ -254,6 +259,29 @@ public class SwUtil {
                 defWorld.getBlockAt(XBlockj, intY, ZBlock1).setType(m);
             }
         }
+    }
+
+    public static Chunk makeChunkZone(Location loc,Material m){
+        double x = Double.parseDouble(loc.getX());
+        double y = Double.parseDouble(loc.getY());
+        double z = Double.parseDouble(loc.getZ());
+        World defWorld = Bukkit.getServer().getWorld("world");
+        Objects.requireNonNull(defWorld);
+        Block block = defWorld.getBlockAt((int) x, (int) y, (int) z);
+        Chunk chunk = block.getChunk();
+        int chunkSize = 16;
+        int chunkX = chunk.getX();
+        int chunkZ = chunk.getZ();
+        int y1 = (int) y;
+        for (int i = 0; i < chunkSize; i++) {
+            block = defWorld.getBlockAt((int) chunkX + i, (int) y, (int) chunkZ);
+            block.setType(m);
+            for (int j = 1; j < chunkSize; j++) {
+                block = defWorld.getBlockAt((int) chunkX, (int) y, (int) chunkZ + j);
+                block.setType(m);
+            }
+        }
+        return chunk;
     }
 
     public static boolean isInChunkZone(org.bukkit.Location currLoc, Chunk chunk) {

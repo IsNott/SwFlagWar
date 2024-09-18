@@ -54,6 +54,7 @@ public class SwFlagWar extends JavaPlugin {
         } catch (IOException | InvalidConfigurationException e) {
             throw new RuntimeException(e);
         }
+        // Reg flag war model
         if (config.getBoolean(KeyWord.CONFIG.FLAG_ENABLE)) {
             File[] files = file.listFiles();
             if(SwUtil.isNotNull(files)) {
@@ -68,20 +69,24 @@ public class SwFlagWar extends JavaPlugin {
             Objects.requireNonNull(this.getCommand(GlobalFactory.FW_COMMAND)).setExecutor(new FlagWarExecutor(this));
             swLogger.info(message.getString(KeyWord.CONFIG.REG_FLAG));
         }
+
+        // Reg Death drop model
         if(config.getBoolean(KeyWord.CONFIG.DROP_ENABLE)){
             pluginManager.registerEvents(new SwDeathListener(), this);
             swLogger.info(message.getString(KeyWord.CONFIG.REG_DEATH));
         }
 
-        if(config.getBoolean("money.enable")){
+        // Reg money model
+        if(config.getBoolean(KeyWord.CONFIG.MONEY_ENABLE)){
             RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
             if (rsp == null) {
                 return;
             }
             Objects.requireNonNull(this.getCommand(GlobalFactory.SW_COMMAND)).setExecutor(new SwMoneyExecutor(this));
-            swLogger.info("SimpleWorld经济模块加载成功");
+            swLogger.info(message.getString(KeyWord.CONFIG.REG_MONEY));
         }
 
+        // Reg Offer model
         if(config.getBoolean(KeyWord.CONFIG.OFFER_ENABLE)){
             Objects.requireNonNull(this.getCommand(GlobalFactory.OFFER_COMMAND)).setExecutor(new OfferExecutor(this));
             swLogger.info(message.getString(KeyWord.CONFIG.REG_OFFER));

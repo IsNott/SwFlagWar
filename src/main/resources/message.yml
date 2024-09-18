@@ -50,6 +50,8 @@ war:
   start_occupy: '玩家[%s]在%[s]放置了占领物,将于%s分钟后完成占领'
   process_title: '王国[%s]正在占领该地,剩余时间[%s]'
   not_join_kingdom: '你还没有加入王国,无法占领'
+  processing: '当前区块已经开始占领,需要移除其他王国的占领物'
+  remove_process: '当前占领区块王国占领物已移除,重新放置开始计时'
 
 death_drop:
   inventory: 'PVP死亡裁决触发,随机掉落了%s格背包物品'
@@ -57,7 +59,14 @@ death_drop:
 
 money:
   bank_name: '[SimpleWorld银行]'
-  bal: '你的SW余额:%s'
+  bal: '%s的SW银行余额:%s'
+  payed_msg: '[SimpleWorld银行]:SW银行账户支出了%s,现剩余%s'
+  not_enough: '[SimpleWorld银行]:SW银行余额不足'
+  received_msg: '[SimpleWorld银行]:接收到来自%s的%s'
+  player_not_found: '[SimpleWorld银行]:没有找到玩家%s'
+  number_format_error: '[SimpleWorld银行]数字输入有误'
+  operation_success: '[SimpleWorld银行]操作成功,%s的余额 -> %s'
+
 
 common:
   next: '输入%s查看下一页'
@@ -72,3 +81,4 @@ registry:
   offer_success: '悬赏模块注册成功'
   death_success: '死亡裁决模块注册成功'
   flag_success: '占领战争模块注册成功'
+  money_success: '经济模块注册成功'

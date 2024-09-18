@@ -43,30 +43,31 @@ public class SwFlagWarListener implements Listener {
 
     private static ConcurrentHashMap<UUID, War> PLAYER_IN_WAR_ZONE = new ConcurrentHashMap<>();
 
-    private static ConcurrentHashMap<UUID, CountDownBar> playerCountDowBar = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, CountDownBar> playerCountDowBar = new ConcurrentHashMap<>();
+
+    private static Vector<String> processingWars = new Vector<>();
 
     // Listening Flag war game open and broadcast remind message.
     @EventHandler(priority = EventPriority.NORMAL)
     public void onFlagWarOpenEvent(FlagWarOpenEvent flagWarOpenEvent) {
         War war = flagWarOpenEvent.getWar();
-        String start = war.getStart();
         String end = war.getEnd();
         List<Location> locations = war.getLocations();
 
         String tipMsg = SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE, KeyWord.CONFIG.WAR_STARTING_TIP);
-        Location loc = locations.get(0);
-        SwUtil.makeSquare(loc, FlagWarExecutor.CONFIG_YML_FILE.getInt("flag_war.game_radius"), Material.BEDROCK);
-        String formatMsg = String.format(tipMsg, loc, end);
-        SwUtil.broadcast(
-                formatMsg,
-                ChatColor.GOLD);
-        FlagWarManager.loadWarGame2Map(war);
-//        locations.forEach(loc -> {
-////            SwUtil.makeCircle(loc,FlagWarExecutor.CONFIG_YML_FILE.getInt("flagWar.game_radius",10), Material.BEDROCK);
-//
-//            );
-//
-//        });
+
+        locations.forEach(loc -> {
+//            SwUtil.makeCircle(loc,FlagWarExecutor.CONFIG_YML_FILE.getInt("flagWar.game_radius",10), Material.BEDROCK);
+//            SwUtil.makeSquare(loc, FlagWarExecutor.CONFIG_YML_FILE.getInt("flag_war.game_radius"), Material.BEDROCK);
+            Chunk chunk = SwUtil.makeChunkZone(loc, Material.BEDROCK);
+            war.setChunk(chunk);
+            String formatMsg = String.format(tipMsg, loc, end);
+            SwUtil.broadcast(
+                    formatMsg,
+                    ChatColor.GOLD);
+            FlagWarManager.loadWarGame2Map(war);
+
+        });
     }
 
     // Check if player enter opening flag war game zone.
@@ -87,21 +88,27 @@ public class SwFlagWarListener implements Listener {
                 String key = iterator.next();
                 War war = FlagWarManager.STARTED_WAR_MAP.get(key);
                 Location location = war.getLocations().get(0);
-                // TODO Get War Game Info By Location
+                // Get War Game Info By Location
                 // Check if player entering/leaving game zone.
                 // enter
-                if (SwUtil.isInGameSquare(eventTo, location,gameRadius) && !SwUtil.isInGameSquare(from,location,gameRadius)) {
+                Chunk toChunk = eventTo.getChunk();
+                Chunk fromChunk = from.getChunk();
+                Chunk chunk = war.getChunk();
+                if (chunk == null) {
+                    continue;
+                }
+//                if (SwUtil.isInGameSquare(eventTo, location,gameRadius) && !SwUtil.isInGameSquare(from,location,gameRadius)) {
+                if (toChunk.equals(chunk) && !fromChunk.equals(chunk)) {
                     PLAYER_IN_WAR_ZONE.put(player.getUniqueId(), war);
-                    player.sendTitle("",ChatColor.GOLD +SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE, "war.enter_zone"), 20, 70, 20);
-//                    SwUtil.spigotTextMessage(player.spigot(),SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE,"war.enter_zone"),ChatColor.GOLD);
+                    player.sendTitle("", ChatColor.GOLD + SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE, "war.enter_zone"), 20, 30, 20);
                 }
 
                 // leaving
-                if (!SwUtil.isInGameSquare(eventTo, location,gameRadius) && SwUtil.isInGameSquare(from,location,gameRadius)) {
+//                if (!SwUtil.isInGameSquare(eventTo, location,gameRadius) && SwUtil.isInGameSquare(from,location,gameRadius)) {
+                if (!toChunk.equals(chunk) && fromChunk.equals(chunk)) {
                     PLAYER_IN_WAR_ZONE.remove(player.getUniqueId());
-                    player.sendTitle("",ChatColor.GREEN + SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE, "war.leave_zone"), 20, 70, 20);
+                    player.sendTitle("", ChatColor.GREEN + SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE, "war.leave_zone"), 20, 30, 20);
                     playerCountDowBar.remove(player.getUniqueId());
-//                    SwUtil.spigotTextMessage(player.spigot(),SwUtil.retMessage(FlagWarExecutor.MESSAGE_YML_FILE,"war.leave_zone"), ChatColor.DARK_GREEN);
                 }
             }
         });
@@ -123,33 +130,60 @@ public class SwFlagWarListener implements Listener {
         if (material.isAir()) {
             return;
         }
-        // When Player on Flag war game zone place an item and starting to count down time.
-        ItemStack itemStack = configFile.getItemStack("flag_war.occupy_item", new ItemStack(Material.CRYING_OBSIDIAN));
-        if (itemStack.getType().equals(material)) {
-            // start to count down and BroadCast Info to other Player
-            KingdomPlayer kingdomPlayer = KingdomPlayer.getKingdomPlayer(player);
-            if (!kingdomPlayer.hasKingdom()) {
-                player.sendTitle("",SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE,"war.not_join_kingdom"), 20, 70, 20);
-                return;
+        String uuid = war.getUUID();
+        if (processingWars.contains(uuid)) {
+            event.setCancelled(true);
+            player.sendTitle("", SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE, "war.processing"), 20, 30, 20);
+        } else {
+            // When Player on Flag war game zone place an item and starting to count down time.
+            ItemStack itemStack = configFile.getItemStack("flag_war.occupy_item", new ItemStack(Material.CRYING_OBSIDIAN));
+            if (itemStack.getType().equals(material)) {
+                // start to count down and BroadCast Info to other Player
+                KingdomPlayer kingdomPlayer = KingdomPlayer.getKingdomPlayer(player);
+                if (!kingdomPlayer.hasKingdom()) {
+                    player.sendTitle("", SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE, "war.not_join_kingdom"), 20, 70, 20);
+                    return;
+                }
+                String processStr = AbstractExecutor.MESSAGE_YML_FILE.getString("war.process_title");
+                int time = AbstractExecutor.CONFIG_YML_FILE.getInt("flag_war.occupy_time", 600);
+                String title = String.format(processStr, kingdomPlayer.getKingdom().getName(), time);
+                CountDownBar countDownBar = CountDownBar.create(title, time);
+
+                //TODO List player and CountDown bar
+                List<Player> playerInChunk = Arrays.stream(war.getChunk().getEntities()).filter(r -> r instanceof Player)
+                        .map(r -> (Player) r)
+                        .collect(Collectors.toList());
+                countDownBar.addPlayers(playerInChunk);
+                countDownBar.run();
+                playerCountDowBar.put(uuid,countDownBar);
             }
-            String processStr = AbstractExecutor.MESSAGE_YML_FILE.getString("war.process_title");
-            int time = AbstractExecutor.CONFIG_YML_FILE.getInt("flag_war.occupy_time", 600);
-            String title = String.format(processStr, kingdomPlayer.getKingdom().getName(),time);
-            CountDownBar countDownBar = CountDownBar.create(title, time);
-            //TODO List player and CountDown bar
-            List<Player> playerInChunk = Arrays.stream(war.getChunk().getEntities()).filter(r -> r instanceof Player)
-                    .map(r -> (Player) r)
-                    .collect(Collectors.toList());
-            countDownBar.addPlayers(playerInChunk);
-            countDownBar.run();
         }
 
     }
 
-    // TODO Check if Other player break occupy item from first player
+    // Check if Other player break occupy item from first player
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onBlockBreakEvent(BlockBreakEvent event){
-
+    public void onBlockBreakEvent(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        UUID uniqueId = player.getUniqueId();
+        if (!PLAYER_IN_WAR_ZONE.containsKey(uniqueId)) {
+            return;
+        }
+        War war = PLAYER_IN_WAR_ZONE.get(uniqueId);
+        Block block = event.getBlock();
+        Chunk chunk = block.getChunk();
+        Material type = block.getType();
+        ItemStack itemStack = FlagWarExecutor.CONFIG_YML_FILE.getItemStack("flag_war.occupy_item", new ItemStack(Material.CRYING_OBSIDIAN));
+        if(chunk.equals(war.getChunk()) && type.equals(itemStack.getType())){
+            playerCountDowBar.get(war.getUUID()).getBossBar().setVisible(false);
+            playerCountDowBar.remove(war.getUUID());
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin,()->{
+                List<Player> playerInChunk = Arrays.stream(war.getChunk().getEntities()).filter(r -> r instanceof Player)
+                        .map(r -> (Player) r)
+                        .collect(Collectors.toList());
+                playerInChunk.forEach(p -> p.sendTitle("", SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE, "war.remove_process"), 20, 30, 20));
+            });
+        }
     }
 
 }

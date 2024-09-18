@@ -58,9 +58,7 @@ public class FlagWarManager implements Manager {
             logger.info(SwUtil.retMessage(messageConfig,GlobalFactory.WAR_MESSAGE_SUFFIX,"nothing_schedule"));
             return;
         }
-        // 异步加载战争
-        BukkitScheduler scheduler = spigot.getServer().getScheduler();
-
+        // 加载战争
         wars.forEach(r -> {
             try {
                 remindWarGame(r);
@@ -68,16 +66,6 @@ public class FlagWarManager implements Manager {
                 SwUtil.logThrow(e);
             }
         });
-
-//        scheduler.runTaskAsynchronously(spigot, () -> {
-//            wars.forEach(r -> {
-//                try {
-//                    remindWarGame(r);
-//                } catch (Exception e) {
-//                    SwUtil.logThrow(e);
-//                }
-//            });
-//        });
 
     }
 
@@ -88,8 +76,6 @@ public class FlagWarManager implements Manager {
 
     public void remindWarGame(boolean instantly, War war) {
         Plugin spigot = getPlugin();
-
-
         try {
             String start = war.getStart();
             String end = war.getEnd();
@@ -112,31 +98,6 @@ public class FlagWarManager implements Manager {
         } catch (Exception e) {
             SwUtil.logThrow(e);
         }
-//        BukkitScheduler bukkitScheduler = spigot.getServer().getScheduler();
-//        bukkitScheduler.runTaskAsynchronously(spigot, () -> {
-//            try {
-//                String start = war.getStart();
-//                String end = war.getEnd();
-//
-//                LocalTime now = LocalTime.now();
-//                LocalTime startTime = LocalTime.parse(start, Formatter.DATE.DATE_TIME_HOUR);
-//                LocalTime endTime = LocalTime.parse(end, Formatter.DATE.DATE_TIME_HOUR);
-//
-//                STARTED_WAR_MAP.remove(war.getUUID());
-//                SCHEDULE_WAR_MAP.remove(war.getUUID());
-//
-//                war.setParseEndTime(endTime);
-//                war.setParseStartTime(startTime);
-//                //  Load/Schedule War Map
-//                if (instantly || startTime.isBefore(now)) {
-//                    loadWar2mapInstantly(war);
-//                } else {
-//                    loadWar2mapSchedule(war, endTime, now);
-//                }
-//            } catch (Exception e) {
-//                SwUtil.logThrow(e);
-//            }
-//        });
     }
 
     private void loadWar2mapSchedule(War war, LocalTime end, LocalTime now) throws InterruptedException {
