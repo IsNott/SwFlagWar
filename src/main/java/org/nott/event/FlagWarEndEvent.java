@@ -1,5 +1,6 @@
 package org.nott.event;
 
+import lombok.Data;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -10,6 +11,7 @@ import org.nott.model.War;
  * @author Nott
  * @date 2024-9-18
  */
+@Data
 public class FlagWarEndEvent extends Event implements Cancellable {
 
     private War war;

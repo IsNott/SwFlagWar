@@ -9,7 +9,7 @@ import java.sql.DriverManager;
  */
 public class SqlLiteManager {
 
-    public Connection getConnect() throws Exception {
+    public static Connection getConnect() throws Exception {
         Class.forName("org.sqlite.JDBC");
         return DriverManager.getConnection("jdbc:sqlite:plugins/Sw-flag-war/database.db");
     }

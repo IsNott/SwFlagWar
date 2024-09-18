@@ -16,8 +16,6 @@ import java.util.List;
  */
 public class GlobalFactory {
 
-    public static List<String> RUNNING_GAME_LOC = Collections.synchronizedList(new ArrayList<String>());
-
     public static final String PLUGIN_NAME = "SwFlagWar";
 
     public static final String MESSAGE_YML = "message.yml";
@@ -25,6 +23,7 @@ public class GlobalFactory {
     public static final String YML_PREFIX = ".yml";
 
     public static final String FW_COMMAND = "flagwar";
+
     public static final String SW_COMMAND = "SimepleWorld";
 
     public static final String OFFER_COMMAND = "offer";

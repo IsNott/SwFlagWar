@@ -58,6 +58,8 @@ public class FlagWarManager implements Manager {
             logger.info(SwUtil.retMessage(messageConfig,GlobalFactory.WAR_MESSAGE_SUFFIX,"nothing_schedule"));
             return;
         }
+        //TODO 已经被占领的不加载（表里有数据）
+
         // 加载战争
         wars.forEach(r -> {
             try {

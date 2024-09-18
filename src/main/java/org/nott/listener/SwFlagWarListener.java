@@ -4,7 +4,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,18 +14,25 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
+import org.kingdoms.constants.group.Kingdom;
 import org.kingdoms.constants.player.KingdomPlayer;
 import org.nott.component.CountDownBar;
+import org.nott.event.FlagWarEndEvent;
 import org.nott.event.FlagWarOpenEvent;
 import org.nott.executor.AbstractExecutor;
 import org.nott.executor.FlagWarExecutor;
 import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
 import org.nott.manager.FlagWarManager;
+import org.nott.manager.SqlLiteManager;
 import org.nott.model.Location;
+import org.nott.model.Reward;
 import org.nott.model.War;
 import org.nott.utils.SwUtil;
 
+import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -45,7 +51,7 @@ public class SwFlagWarListener implements Listener {
 
     private static ConcurrentHashMap<String, CountDownBar> playerCountDowBar = new ConcurrentHashMap<>();
 
-    private static Vector<String> processingWars = new Vector<>();
+    private static ConcurrentHashMap<String, BukkitTask> processingWars = new ConcurrentHashMap<>();
 
     // Listening Flag war game open and broadcast remind message.
     @EventHandler(priority = EventPriority.NORMAL)
@@ -131,7 +137,7 @@ public class SwFlagWarListener implements Listener {
             return;
         }
         String uuid = war.getUUID();
-        if (processingWars.contains(uuid)) {
+        if (processingWars.containsKey(uuid)) {
             event.setCancelled(true);
             player.sendTitle("", SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE, "war.processing"), 20, 30, 20);
         } else {
@@ -144,18 +150,30 @@ public class SwFlagWarListener implements Listener {
                     player.sendTitle("", SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE, "war.not_join_kingdom"), 20, 70, 20);
                     return;
                 }
+                String name = kingdomPlayer.getKingdom().getName();
                 String processStr = AbstractExecutor.MESSAGE_YML_FILE.getString("war.process_title");
                 int time = AbstractExecutor.CONFIG_YML_FILE.getInt("flag_war.occupy_time", 600);
-                String title = String.format(processStr, kingdomPlayer.getKingdom().getName(), time);
+                String title = String.format(processStr, name, time);
                 CountDownBar countDownBar = CountDownBar.create(title, time);
 
-                //TODO List player and CountDown bar
+                // List player and CountDown bar
                 List<Player> playerInChunk = Arrays.stream(war.getChunk().getEntities()).filter(r -> r instanceof Player)
                         .map(r -> (Player) r)
                         .collect(Collectors.toList());
                 countDownBar.addPlayers(playerInChunk);
                 countDownBar.run();
-                playerCountDowBar.put(uuid,countDownBar);
+                playerCountDowBar.put(uuid, countDownBar);
+
+                // Scheduler game end event task
+                BukkitTask task = scheduler.runTaskLaterAsynchronously(plugin, () -> {
+                    FlagWarEndEvent endEvent = new FlagWarEndEvent();
+                    endEvent.setWar(war);
+                    endEvent.setOccupy(true);
+                    endEvent.setOccupiedKingdomName(name);
+                    endEvent.setAsync(true);
+                    Bukkit.getPluginManager().callEvent(endEvent);
+                }, AbstractExecutor.CONFIG_YML_FILE.getInt("flag_war.occupy_time", 600) / 20);
+                processingWars.put(uuid, task);
             }
         }
 
@@ -173,16 +191,66 @@ public class SwFlagWarListener implements Listener {
         Block block = event.getBlock();
         Chunk chunk = block.getChunk();
         Material type = block.getType();
+        String uuid = war.getUUID();
         ItemStack itemStack = FlagWarExecutor.CONFIG_YML_FILE.getItemStack("flag_war.occupy_item", new ItemStack(Material.CRYING_OBSIDIAN));
-        if(chunk.equals(war.getChunk()) && type.equals(itemStack.getType())){
-            playerCountDowBar.get(war.getUUID()).getBossBar().setVisible(false);
-            playerCountDowBar.remove(war.getUUID());
-            Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin,()->{
+        if (chunk.equals(war.getChunk()) && type.equals(itemStack.getType())) {
+            playerCountDowBar.get(uuid).getBossBar().setVisible(false);
+            playerCountDowBar.remove(uuid);
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                 List<Player> playerInChunk = Arrays.stream(war.getChunk().getEntities()).filter(r -> r instanceof Player)
                         .map(r -> (Player) r)
                         .collect(Collectors.toList());
                 playerInChunk.forEach(p -> p.sendTitle("", SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE, "war.remove_process"), 20, 30, 20));
             });
+            if (processingWars.containsKey(uuid)) {
+                BukkitTask task = processingWars.get(uuid);
+                task.cancel();
+                processingWars.remove(uuid);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onWarEndEvent(FlagWarEndEvent event){
+        boolean occupy = event.isOccupy();
+        War war = event.getWar();
+        String uuid = war.getUUID();
+        FlagWarManager.STARTED_WAR_MAP.remove(uuid);
+        processingWars.remove(uuid);
+        playerCountDowBar.remove(uuid);
+        if(occupy){
+            String kingdomName = event.getOccupiedKingdomName();
+            Kingdom kingdom = Kingdom.getKingdom(kingdomName);
+            List<KingdomPlayer> kingdomPlayers = kingdom.getKingdomPlayers();
+            List<Integer> types = war.getTypes();
+            Connection connect = null;
+            PreparedStatement st = null;
+            try {
+                connect = SqlLiteManager.getConnect();
+                st = connect.prepareStatement("select id from flag_war_info where war_uuid = ?");
+                st.setString(1, uuid);
+                ResultSet resultSet = st.executeQuery();
+                Reward rewards = war.getRewards();
+                if (resultSet.wasNull()) {
+                    st = connect.prepareStatement("insert into flag_war_info(" +
+                            "war_uuid,occupy_kingdoms_name,reward_type,command,level_up,effect,item,period_val,period,create_time" +
+                            ") set (?,?,?,?,?,?,?,?,?,?)");
+                    st.setString(1,uuid);
+                    st.setString(2,kingdomName);
+                    st.setString(3,rewards.getType().stream().map(String::valueOf).collect(Collectors.joining(",")));
+                    st.setString(4,rewards.getCommand());
+                    st.setInt(5,rewards.getLevelUp());
+                    st.setString(6,rewards.getEffect());
+                    st.setString(7,rewards.getMaterial());
+                    st.setInt(8,rewards.getPeriodVal());
+                    st.setDate(9,new Date(new java.util.Date().getTime()));
+                }
+            } catch (Exception e) {
+                SwUtil.logThrow(e);
+            }
+
+        }else {
+            SwUtil.broadcast(SwUtil.retMessage(AbstractExecutor.MESSAGE_YML_FILE,"war.not_occupy_end"), ChatColor.DARK_AQUA);
         }
     }
 

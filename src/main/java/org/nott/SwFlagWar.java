@@ -8,7 +8,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.nott.executor.FlagWarExecutor;
 import org.nott.executor.OfferExecutor;
 import org.nott.executor.SwMoneyExecutor;
@@ -91,6 +90,8 @@ public class SwFlagWar extends JavaPlugin {
             Objects.requireNonNull(this.getCommand(GlobalFactory.OFFER_COMMAND)).setExecutor(new OfferExecutor(this));
             swLogger.info(message.getString(KeyWord.CONFIG.REG_OFFER));
         }
+
+
         swLogger.info("SimpleWorld FlagWar 加载成功");
 
     }

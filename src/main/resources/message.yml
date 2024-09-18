@@ -52,6 +52,7 @@ war:
   not_join_kingdom: '你还没有加入王国,无法占领'
   processing: '当前区块已经开始占领,需要移除其他王国的占领物'
   remove_process: '当前占领区块王国占领物已移除,重新放置开始计时'
+  not_occupy_end: '由于无人占领,位于[%s]的战争结束'
 
 death_drop:
   inventory: 'PVP死亡裁决触发,随机掉落了%s格背包物品'
