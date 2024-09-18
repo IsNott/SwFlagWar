@@ -2,6 +2,7 @@ package org.nott;
 
 
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,6 +27,11 @@ import java.util.logging.Logger;
 public class SwFlagWar extends JavaPlugin {
 
     public final Logger swLogger = super.getLogger();
+
+    public static final QuickShopAPI quickShopApi;
+    public static final QuickShop quickShop;
+
+
 
     @Override
     public void onDisable() {
@@ -90,6 +96,13 @@ public class SwFlagWar extends JavaPlugin {
             Objects.requireNonNull(this.getCommand(GlobalFactory.OFFER_COMMAND)).setExecutor(new OfferExecutor(this));
             swLogger.info(message.getString(KeyWord.CONFIG.REG_OFFER));
         }
+
+        RegisteredServiceProvider<QuickShopProvider> provider = Bukkit.getServicesManager().getRegistration(QuickShopProvider.class);
+        if (provider == null) {
+            throw new IllegalStateException("QuickShop hadn't loaded at this moment.");
+        }
+        quickShopApi = provider.getProvider().getApiInstance();
+        quickShop internalInstance = provider.getProvider().getPluginInstance();
 
 
         swLogger.info("SimpleWorld FlagWar 加载成功");
