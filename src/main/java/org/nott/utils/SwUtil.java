@@ -1,5 +1,6 @@
 package org.nott.utils;
 
+import com.ghostchu.quickshop.api.shop.Shop;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.nott.SwFlagWar;
 import org.nott.global.Formatter;
 import org.nott.global.GlobalFactory;
 import org.nott.model.Location;
@@ -323,5 +325,25 @@ public class SwUtil {
                 (gotoX <= pX && gotoX >= (pX - gameRadius)) && (gotoZ <= pZ && gotoZ >= (pZ - gameRadius));
 
     }
+
+    public static Shop getShopForOne(World world,org.bukkit.Location location) {
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+        org.bukkit.Location location1 = new org.bukkit.Location(world, x + 1, y, z);
+        org.bukkit.Location location2 = new org.bukkit.Location(world, x, y, z + 1);
+        Shop shop = SwFlagWar.quickShopApi.getShopManager().getShop(location);
+        if(shop != null){
+            return shop;
+        }else {
+            shop = SwFlagWar.quickShopApi.getShopManager().getShop(location1);
+            if(shop != null){
+                return shop;
+            }else {
+                return SwFlagWar.quickShopApi.getShopManager().getShop(location2);
+            }
+        }
+    }
+
 }
 
