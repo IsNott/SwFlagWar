@@ -14,7 +14,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nott.executor.FlagWarExecutor;
 import org.nott.executor.OfferExecutor;
-import org.nott.executor.SwMoneyExecutor;
+//import org.nott.executor.SwMoneyExecutor;
 import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
 import org.nott.listener.SwClickBankListener;
@@ -85,14 +85,14 @@ public class SwFlagWar extends JavaPlugin {
         }
 
         // Reg money model
-        if(config.getBoolean(KeyWord.CONFIG.MONEY_ENABLE)){
-            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-            if (rsp == null) {
-                return;
-            }
-            Objects.requireNonNull(this.getCommand(GlobalFactory.SW_COMMAND)).setExecutor(new SwMoneyExecutor(this));
-            swLogger.info(message.getString(KeyWord.CONFIG.REG_MONEY));
-        }
+//        if(config.getBoolean(KeyWord.CONFIG.MONEY_ENABLE)){
+//            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+//            if (rsp == null) {
+//                return;
+//            }
+//            Objects.requireNonNull(this.getCommand(GlobalFactory.SW_COMMAND)).setExecutor(new SwMoneyExecutor(this));
+//            swLogger.info(message.getString(KeyWord.CONFIG.REG_MONEY));
+//        }
 
         // Reg Offer model
         if(config.getBoolean(KeyWord.CONFIG.OFFER_ENABLE)){

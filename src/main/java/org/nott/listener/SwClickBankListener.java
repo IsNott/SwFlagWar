@@ -4,6 +4,7 @@ import com.ghostchu.quickshop.api.shop.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,6 +23,7 @@ import org.nott.executor.AbstractExecutor;
 import org.nott.global.GlobalFactory;
 import org.nott.utils.SwUtil;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -38,7 +40,10 @@ public class SwClickBankListener implements Listener {
     @EventHandler
     public void onPlayerClickEvent(PlayerInteractEvent e){
         Block clickedBlock = e.getClickedBlock();
-        if (SwUtil.isNull(clickedBlock))return;
+        World world = e.getPlayer().getWorld();
+        String name = world.getName();
+        List<String> disableWorlds = AbstractExecutor.CONFIG_YML_FILE.getStringList("bank.disable_world");
+        if (SwUtil.isNull(clickedBlock) || disableWorlds.contains(name))return;
         Location location = clickedBlock.getLocation();
         if (SwUtil.isNull(location))return;
         Player player = e.getPlayer();

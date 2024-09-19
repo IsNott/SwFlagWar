@@ -40,20 +40,23 @@ offer:
   tax: 0
 
 # developing
-money:
-  enable: false
-  def: 0
-
-# developing
 online:
   enable: false
-  period: HOUR
-  period_val: 1
-  money: 300
+  rewards:
+    - type: item
+      amount: ['Diamond-5','']
+      val: 1
+    - type: money
+      amount: 888
+      val: 2
+    - type: rp
+      amount: 3000
+      val: 4
 
 # Handle Player Click Bank-Item Shop event
 bank:
   enable: true
+  disable_world: ['kingdom','world_nether','world_the_end']
 
 # Death Drops Item
 drop:
@@ -66,3 +69,7 @@ drop:
     probability: 0.3
     max: 3
 
+# Give up for now
+#money:
+#  enable: false
+#  def: 0
