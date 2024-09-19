@@ -38,6 +38,7 @@ public interface KeyWord {
         public static final String WAR_OPEN_TIP = "war.war_open_tip";
         public static final String FLAG_ENABLE = "flag_war.enable";
         public static final String OFFER_ENABLE = "offer.enable";
+        public static final String BANK_ENABLE = "bank.enable";
         public static final String DROP_ENABLE = "drop.enable";
         public static final String MONEY_ENABLE = "moeny.enable";
         public static final String DROP_INVENTORY = "death_drop.inventory";
@@ -50,6 +51,7 @@ public interface KeyWord {
         public static final String REG_DEATH = "registry.death_success";
         public static final String REG_FLAG = "registry.flag_success";
         public static final String REG_MONEY = "registry.flag_success";
+        public static final String REG_BANK = "registry.bank_success";
     }
 
     public interface COMMON{

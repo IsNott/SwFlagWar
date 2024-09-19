@@ -1,6 +1,9 @@
 package org.nott;
 
 
+import com.ghostchu.quickshop.QuickShop;
+import com.ghostchu.quickshop.api.QuickShopAPI;
+import com.ghostchu.quickshop.api.QuickShopProvider;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -14,6 +17,7 @@ import org.nott.executor.OfferExecutor;
 import org.nott.executor.SwMoneyExecutor;
 import org.nott.global.GlobalFactory;
 import org.nott.global.KeyWord;
+import org.nott.listener.SwClickBankListener;
 import org.nott.listener.SwDeathListener;
 import org.nott.listener.SwFlagWarListener;
 import org.nott.manager.FlagWarManager;
@@ -28,8 +32,7 @@ public class SwFlagWar extends JavaPlugin {
 
     public final Logger swLogger = super.getLogger();
 
-    public static final QuickShopAPI quickShopApi;
-    public static final QuickShop quickShop;
+    public static QuickShopAPI quickShopApi;
 
 
 
@@ -97,13 +100,16 @@ public class SwFlagWar extends JavaPlugin {
             swLogger.info(message.getString(KeyWord.CONFIG.REG_OFFER));
         }
 
-        RegisteredServiceProvider<QuickShopProvider> provider = Bukkit.getServicesManager().getRegistration(QuickShopProvider.class);
-        if (provider == null) {
-            throw new IllegalStateException("QuickShop hadn't loaded at this moment.");
+        // Reg Bank model
+        if(config.getBoolean(KeyWord.CONFIG.BANK_ENABLE)){
+            RegisteredServiceProvider<QuickShopProvider> provider = Bukkit.getServicesManager().getRegistration(QuickShopProvider.class);
+            if (provider == null) {
+                throw new IllegalStateException("QuickShop hadn't loaded at this moment.");
+            }
+            quickShopApi = provider.getProvider().getApiInstance();
+            pluginManager.registerEvents(new SwClickBankListener(),this);
+            swLogger.info(message.getString(KeyWord.CONFIG.REG_BANK));
         }
-        quickShopApi = provider.getProvider().getApiInstance();
-        quickShop internalInstance = provider.getProvider().getPluginInstance();
-
 
         swLogger.info("SimpleWorld FlagWar 加载成功");
 

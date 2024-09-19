@@ -14,6 +14,7 @@
 # =============================================================================================================
 # =============================================================================================================
 # =============================================================================================================   
+# developing
 flag_war:
   enable: false
   # 1 < radius,default 10
@@ -31,21 +32,30 @@ flag_war:
   occupy_time: 600
   # Flag war game zone radius. default 4
   game_radius: 4
+
+# developing
 offer:
   enable: false
   cost_before: true
   tax: 0
 
+# developing
 money:
-  enable: true
+  enable: false
   def: 0
 
+# developing
 online:
-  enable: true
+  enable: false
   period: HOUR
   period_val: 1
   money: 300
 
+# Handle Player Click Bank-Item Shop event
+bank:
+  enable: true
+
+# Death Drops Item
 drop:
   enable: true
   head:

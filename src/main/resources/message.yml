@@ -68,6 +68,11 @@ money:
   number_format_error: '[SimpleWorld银行]数字输入有误'
   operation_success: '[SimpleWorld银行]操作成功,%s的余额 -> %s'
 
+sw_bank:
+  not_claim_shop: '该SW银行不属于你所属王国占领'
+  not_belong_shop: '该SW银行已被%s王国占领,无法交互'
+  wild_shop: '该SW银行还未被占领,占领后可交互'
+
 
 common:
   next: '输入%s查看下一页'
@@ -83,3 +88,4 @@ registry:
   death_success: '死亡裁决模块注册成功'
   flag_success: '占领战争模块注册成功'
   money_success: '经济模块注册成功'
+  bank_success: '银行事件模块注册成功'
