@@ -1,10 +1,9 @@
 package org.nott;
 
 
-import com.ghostchu.quickshop.QuickShop;
+
 import com.ghostchu.quickshop.api.QuickShopAPI;
 import com.ghostchu.quickshop.api.QuickShopProvider;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,6 +19,7 @@ import org.nott.global.KeyWord;
 import org.nott.listener.SwClickBankListener;
 import org.nott.listener.SwDeathListener;
 import org.nott.listener.SwFlagWarListener;
+import org.nott.listener.SwPlayerJoinEvent;
 import org.nott.manager.FlagWarManager;
 import org.nott.utils.SwUtil;
 import java.io.File;
@@ -98,6 +98,12 @@ public class SwFlagWar extends JavaPlugin {
         if(config.getBoolean(KeyWord.CONFIG.OFFER_ENABLE)){
             Objects.requireNonNull(this.getCommand(GlobalFactory.OFFER_COMMAND)).setExecutor(new OfferExecutor(this));
             swLogger.info(message.getString(KeyWord.CONFIG.REG_OFFER));
+        }
+
+        // Reg Online-reward model
+        if(config.getBoolean(KeyWord.CONFIG.ONLINE_ENABLE)){
+            pluginManager.registerEvents(new SwPlayerJoinEvent(),this);
+            swLogger.info(message.getString(KeyWord.CONFIG.REG_ONLINE));
         }
 
         // Reg Bank model

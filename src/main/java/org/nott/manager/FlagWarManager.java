@@ -59,7 +59,6 @@ public class FlagWarManager implements Manager {
             return;
         }
         //TODO 已经被占领的不加载（表里有数据）
-
         // 加载战争
         wars.forEach(r -> {
             try {

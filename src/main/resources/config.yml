@@ -41,17 +41,10 @@ offer:
 
 # developing
 online:
-  enable: false
-  rewards:
-    - type: item
-      amount: ['Diamond-5','']
-      val: 1
-    - type: money
-      amount: 888
-      val: 2
-    - type: rp
-      amount: 3000
-      val: 4
+  enable: true
+  rp: 600
+  diamond: 5
+  exp: 300
 
 # Handle Player Click Bank-Item Shop event
 bank:

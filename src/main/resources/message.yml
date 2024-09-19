@@ -58,6 +58,11 @@ death_drop:
   inventory: 'PVP死亡裁决触发,随机掉落了%s格背包物品'
   head: 'PVP死亡裁决触发,你的头颅掉落了...'
 
+online:
+  rp_reward: '接收到在线奖励,王国资源点x'
+  item_reward: '接收到在线奖励,钻石x'
+  exp_reward: '接收到在线奖励,经验x'
+
 money:
   bank_name: '[SimpleWorld银行]'
   bal: '%s的SW银行余额:%s'
@@ -89,3 +94,4 @@ registry:
   flag_success: '占领战争模块注册成功'
   money_success: '经济模块注册成功'
   bank_success: '银行事件模块注册成功'
+  online_success: '在线奖励模块注册成功'
